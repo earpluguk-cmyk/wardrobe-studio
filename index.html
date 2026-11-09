@@ -136,7 +136,7 @@ function renderTrips(){
  const trips=records.filter(x=>x.kind==='trip');
  const ready=records.filter(x=>x.kind==='outfit'&&x.status==='Ready');
  $('tripList').innerHTML=trips.map(t=>{
-  let html='<div class="backup"><h3>'+esc(t.name)+'</h3><p>'+(t.startDate?esc(t.startDate)+' · ':'')+t.days+' days</p></div>';
+  let html='<div class="backup"><h3>'+esc(t.name)+'</h3><p>'+(t.startDate?esc(t.startDate)+' · ':'')+t.days+' days</p><button class="secondary" data-id="'+t.id+'" onclick="deleteTrip(this.dataset.id)">Delete trip</button></div>';
   for(let day=0;day<t.days;day++){
    let dateLabel='';if(t.startDate){let dt=new Date(t.startDate+'T12:00:00');dt.setDate(dt.getDate()+day);if(!isNaN(dt))dateLabel=' · '+dt.toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'})}html+='<div class="trip-day"><h3>Day '+(day+1)+dateLabel+'</h3>';
    ['Day outfit','Evening outfit','Beach outfit','Swimming outfit','Sleepwear'].forEach(slot=>{
@@ -148,7 +148,7 @@ function renderTrips(){
   return html;
  }).join('')||empty('No holidays planned yet','Create a trip to start planning outfits.');
 }
-async function setTripOutfit(el){
+async function deleteTrip(id){if(!confirm('Delete this holiday plan? Your saved outfits and clothing will remain.'))return;await removeRecord(id);records=await all();renderTrips()}\nasync function setTripOutfit(el){
  const trip=records.find(x=>x.id===el.dataset.trip);if(!trip)return;
  trip.plan=trip.plan||{};trip.plan[el.dataset.day]=trip.plan[el.dataset.day]||{};
  if(el.value)trip.plan[el.dataset.day][el.dataset.slot]=el.value;else delete trip.plan[el.dataset.day][el.dataset.slot];
