@@ -127,7 +127,8 @@ let currentDetailId=null;function showOutfitDetail(id){currentDetailId=id;let x=
 async function duplicateOutfit(id){let x=records.find(r=>r.id===id&&r.kind==='outfit');if(!x)return;let copy={...x,id:uid(),name:(x.name||'Outfit')+' (copy)',created:Date.now(),updated:Date.now()};await put(copy);records=await all();render();showOutfitDetail(copy.id)}
 async function createTrip(){
  const name=prompt('Trip name','Holiday'); if(!name||!name.trim())return;
- const startDate=prompt('Holiday start date (YYYY-MM-DD), if known:','')||'';\n const days=Number(prompt('How many days?','7')); if(!Number.isInteger(days)||days<1||days>60){alert('Enter 1–60 days.');return}
+ const startDate=prompt('Holiday start date (YYYY-MM-DD), if known:','')||'';
+ const days=Number(prompt('How many days?','7')); if(!Number.isInteger(days)||days<1||days>60){alert('Enter 1–60 days.');return}
  const trip={id:uid(),kind:'trip',name:name.trim(),startDate:startDate,days:days,plan:{},created:Date.now(),updated:Date.now()};
  await put(trip);records=await all();renderTrips();
 }
