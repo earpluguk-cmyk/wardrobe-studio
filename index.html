@@ -127,17 +127,17 @@ let currentDetailId=null;function showOutfitDetail(id){currentDetailId=id;let x=
 async function duplicateOutfit(id){let x=records.find(r=>r.id===id&&r.kind==='outfit');if(!x)return;let copy={...x,id:uid(),name:(x.name||'Outfit')+' (copy)',created:Date.now(),updated:Date.now()};await put(copy);records=await all();render();showOutfitDetail(copy.id)}
 async function createTrip(){
  const name=prompt('Trip name','Holiday'); if(!name||!name.trim())return;
- const days=Number(prompt('How many days?','7')); if(!Number.isInteger(days)||days<1||days>60){alert('Enter 1–60 days.');return}
- const trip={id:uid(),kind:'trip',name:name.trim(),days:days,plan:{},created:Date.now(),updated:Date.now()};
+ const startDate=prompt('Holiday start date (YYYY-MM-DD), if known:','')||'';\n const days=Number(prompt('How many days?','7')); if(!Number.isInteger(days)||days<1||days>60){alert('Enter 1–60 days.');return}
+ const trip={id:uid(),kind:'trip',name:name.trim(),startDate:startDate,days:days,plan:{},created:Date.now(),updated:Date.now()};
  await put(trip);records=await all();renderTrips();
 }
 function renderTrips(){
  const trips=records.filter(x=>x.kind==='trip');
  const ready=records.filter(x=>x.kind==='outfit'&&x.status==='Ready');
  $('tripList').innerHTML=trips.map(t=>{
-  let html='<div class="backup"><h3>'+esc(t.name)+'</h3><p>'+t.days+' days</p></div>';
+  let html='<div class="backup"><h3>'+esc(t.name)+'</h3><p>'+(t.startDate?esc(t.startDate)+' · ':'')+t.days+' days</p></div>';
   for(let day=0;day<t.days;day++){
-   html+='<div class="trip-day"><h3>Day '+(day+1)+'</h3>';
+   let dateLabel='';if(t.startDate){let dt=new Date(t.startDate+'T12:00:00');dt.setDate(dt.getDate()+day);if(!isNaN(dt))dateLabel=' · '+dt.toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'})}html+='<div class="trip-day"><h3>Day '+(day+1)+dateLabel+'</h3>';
    ['Day outfit','Evening outfit','Beach outfit','Swimming outfit','Sleepwear'].forEach(slot=>{
     const selected=t.plan&&t.plan[day]&&t.plan[day][slot]||'';
     html+='<div class="trip-slot"><strong>'+slot+'</strong><select data-trip="'+t.id+'" data-day="'+day+'" data-slot="'+slot+'" onchange="setTripOutfit(this)"><option value="">Choose outfit</option>'+ready.map(o=>'<option value="'+o.id+'" '+(o.id===selected?'selected':'')+'>'+esc(o.name)+'</option>').join('')+'</select>'+(ready.find(o=>o.id===selected)?'<div class="trip-choice">'+(ready.find(o=>o.id===selected).photo?'<img src="'+ready.find(o=>o.id===selected).photo+'" alt="">':'')+'<button data-id="'+selected+'" onclick="details(this.dataset.id)">'+esc(ready.find(o=>o.id===selected).name)+' · View outfit</button></div>':'')+'</div></div>';
