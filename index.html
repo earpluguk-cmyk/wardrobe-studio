@@ -113,7 +113,7 @@ function openForm(k,status='',id=''){
   }else{
     const types=[...new Set(records.filter(i=>i.kind==='item'&&!i.archived).map(i=>(i.type||'').trim()).filter(Boolean))].sort();
     const picker=records.filter(i=>i.kind==='item'&&(!i.archived||(x.itemIds||[]).includes(i.id))).sort((a,b)=>(b.created||b.updated||0)-(a.created||a.updated||0)).map(i=>`
-      <label class="outfit-pick-card" data-name="${esc(i.name)}" data-type="${esc(i.type||'')}" data-colours="${esc(itemColours(i).join('|'))}">
+      <label class="outfit-pick-card" data-name="${esc(i.name)}" data-type="${esc(i.type||'')}" data-colours="${esc(itemColours(i).join('|'))}" data-created="${i.created||i.updated||0}">
         <input type="checkbox" name="itemIds" value="${i.id}" ${(x.itemIds||[]).includes(i.id)?'checked':''}>
         <span class="outfit-pick-photo">${i.photo?'<img src="'+esc(i.photo)+'" alt="'+esc(i.name)+'">':'<span class="outfit-pick-placeholder">No photo</span>'}</span>
         <span class="outfit-pick-name">${esc(i.name)}</span>
@@ -125,6 +125,7 @@ function openForm(k,status='',id=''){
     <div class="field"><label>Find pieces for this outfit</label>
       <input id="outfitItemSearch" placeholder="Search jeans, jumpers, colours…" oninput="filterOutfitPicker()">
       <select id="outfitItemType" style="margin-top:8px" onchange="filterOutfitPicker()"><option value="All">All types</option>${types.map(t=>'<option>'+esc(t)+'</option>').join('')}</select>
+      <select id="outfitItemSort" style="margin-top:8px" aria-label="Sort clothing pieces" onchange="filterOutfitPicker()"><option value="newest">Newest added</option><option value="oldest">Oldest added</option><option value="az">Name A–Z</option></select>
       <div class="sub" style="margin-top:9px">Colour (choose any)</div>
       <div id="outfitColourPicker" class="checks" style="margin-top:7px">${['Neutral',...colourOptions].map(c=>`<label><input type="checkbox" name="outfitColours" value="${c}" onchange="filterOutfitPicker()"> ${c}</label>`).join('')}</div>
       <div id="outfitItemPicker" class="outfit-pick-grid" style="margin-top:10px">${picker}</div>
@@ -148,7 +149,7 @@ function openForm(k,status='',id=''){
 }
 
 
-function filterOutfitPicker(){let q=($('outfitItemSearch')?.value||'').toLowerCase(),t=$('outfitItemType')?.value||'All',selected=[...document.querySelectorAll('input[name="outfitColours"]:checked')].map(el=>el.value);document.querySelectorAll('#outfitItemPicker label').forEach(label=>{let colours=(label.dataset.colours||'').split('|').filter(Boolean),colourMatch=!selected.length||selected.some(c=>c==='Neutral'?colours.some(v=>neutralColours.includes(v)):colours.includes(c)),typeMatch=t==='All'||label.dataset.type===t,searchMatch=(label.dataset.name+' '+label.dataset.type+' '+colours.join(' ')).toLowerCase().includes(q);label.style.display=colourMatch&&typeMatch&&searchMatch?'':'none'})}
+function filterOutfitPicker(){let q=($('outfitItemSearch')?.value||'').toLowerCase(),t=$('outfitItemType')?.value||'All',sort=$('outfitItemSort')?.value||'newest',selected=[...document.querySelectorAll('input[name="outfitColours"]:checked')].map(el=>el.value),picker=$('outfitItemPicker'),labels=[...picker.querySelectorAll('label')];labels.sort((a,b)=>sort==='az'?(a.dataset.name||'').localeCompare(b.dataset.name||''):sort==='oldest'?Number(a.dataset.created||0)-Number(b.dataset.created||0):Number(b.dataset.created||0)-Number(a.dataset.created||0));labels.forEach(label=>{picker.appendChild(label);let colours=(label.dataset.colours||'').split('|').filter(Boolean),colourMatch=!selected.length||selected.some(c=>c==='Neutral'?colours.some(v=>neutralColours.includes(v)):colours.includes(c)),typeMatch=t==='All'||label.dataset.type===t,searchMatch=(label.dataset.name+' '+label.dataset.type+' '+colours.join(' ')).toLowerCase().includes(q);label.style.display=colourMatch&&typeMatch&&searchMatch?'':'none'})}
 function editRecord(id,fromDetail=false){let x=records.find(r=>r.id===id);if(x){returnToDetail=fromDetail;openForm(x.kind,'',id)}}
 async function deleteRecord(id){let x=records.find(r=>r.id===id);if(!x)return;let message=x.kind==='item'?'Delete “'+x.name+'” from your clothing? It will also be removed from any outfits that include it.':'Delete the outfit “'+x.name+'”?';if(!confirm(message))return;try{await removeRecord(id);records=await all();render();if($('outfitDetail').classList.contains('active'))go('outfits')}catch(e){alert('Could not delete this '+(x.kind==='item'?'clothing item':'outfit')+'. Please try again.')}}
 function closeForm(){$('modal').classList.remove('show')}
