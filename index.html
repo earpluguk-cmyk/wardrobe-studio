@@ -28,8 +28,8 @@ function tile(x){
   const isOutfit=x.kind==='outfit';
   const categories=isOutfit?(x.categories||(x.category?[x.category]:[])):(x.contexts||[]);
   const seasons=isOutfit?outfitSeasons(x):[];
-  const tags=isOutfit?[x.status,x.suitability||legacySuitability(x),...categories,...seasons]:[...categories,x.suitability||legacySuitability(x)];
-  const subtitle=isOutfit?[categories.join(' · '),seasons.join(' · ')].filter(Boolean).join(' · '):(x.type+' · '+x.status);
+  const tags=isOutfit?[x.status,x.suitability||legacySuitability(x),...categories,...seasons]:[...categories,...itemSeasons(x),x.suitability||legacySuitability(x)];
+  const subtitle=isOutfit?[categories.join(' · '),seasons.join(' · ')].filter(Boolean).join(' · '):([x.brand,x.type,x.status].filter(Boolean).join(' · '));
   const photo=x.photo?'<img class="photo" src="'+x.photo+'" alt="'+esc(x.name)+'">':'<div class="placeholder">Add a photo</div>';
   const pills=tags.slice(0,5).map(tag=>'<span class="pill">'+esc(tag)+'</span>').join('');
   const click=isOutfit?' onclick="details(&quot;'+x.id+'&quot;)" role="button" tabindex="0"':'';
@@ -37,6 +37,7 @@ function tile(x){
 }
 function render(){let it=records.filter(x=>x.kind==='item'),os=records.filter(x=>x.kind==='outfit');$('nItems').textContent=it.length;$('nOutfits').textContent=os.filter(x=>x.status==='Ready').length;$('nWish').textContent=it.filter(x=>x.status!=='Owned').length+os.filter(x=>x.status!=='Ready').length;$('recent').innerHTML=it.slice(-4).reverse().map(tile).join('')||empty('Your wardrobe starts here','Add a photo of your first piece.');$('homeLooks').innerHTML=os.filter(x=>x.status==='Ready').slice(-2).reverse().map(tile).join('')||empty('No ready outfits yet','Move an outfit to Ready when it is complete.');renderItems();renderOutfits();renderWish()}
 function itemColours(x){return Array.isArray(x.colours)?x.colours:(x.colour?[x.colour]:[])}
+function itemSeasons(x){return Array.isArray(x.seasons)?x.seasons:(x.season?[x.season]:[])}
 function matchesColour(x,filter){let cs=itemColours(x);if(filter==='All colours')return true;if(filter==='Neutral')return cs.some(c=>neutralColours.includes(c));return cs.includes(filter)}
 function renderItems(){
  let q=($('itemQ').value||'').toLowerCase(),items=records.filter(x=>x.kind==='item');
@@ -45,7 +46,7 @@ function renderItems(){
  $('typeChips').innerHTML=['All types',...types].map(t=>'<button class="chip '+((typeFilter===(t==='All types'?'All':t))?'active':'')+'" onclick="typeFilter=\''+(t==='All types'?'All':esc(t))+'\';renderItems()">'+esc(t)+'</button>').join('');
  $('colourChips').innerHTML=['All colours','Neutral',...colourOptions].map(c=>'<button class="chip '+(colourFilter===c?'active':'')+'" onclick="colourFilter=\''+c+'\';renderItems()">'+c+'</button>').join('');
  $('itemSort').value=itemSort;
- let a=items.filter(x=>(itemFilter==='All'||(x.contexts||[]).includes(itemFilter))&&(typeFilter==='All'||(x.type||'').trim()===typeFilter)&&matchesColour(x,colourFilter)&&[x.name,x.type,x.status,x.notes,...(x.contexts||[]),...itemColours(x)].join(' ').toLowerCase().includes(q));
+ let a=items.filter(x=>(itemFilter==='All'||(x.contexts||[]).includes(itemFilter))&&(typeFilter==='All'||(x.type||'').trim()===typeFilter)&&matchesColour(x,colourFilter)&&[x.name,x.brand,x.type,x.status,x.notes,...(x.contexts||[]),...itemColours(x),...itemSeasons(x)].join(' ').toLowerCase().includes(q));
  a.sort((x,y)=>itemSort==='az'?(x.name||'').localeCompare(y.name||''):itemSort==='oldest'?(x.created||x.updated||0)-(y.created||y.updated||0):(y.created||y.updated||0)-(x.created||x.updated||0));
  $('itemGrid').innerHTML=a.map(tile).join('')||empty('Nothing here yet','Add a piece or try another search.')
 }
@@ -62,13 +63,15 @@ function openForm(k,status='',id=''){
   newPhoto='';
   const x=editing||{};
   $('modalTitle').textContent=editing?'Edit '+k:(k==='item'?'Add clothing':'Create outfit');
-  let h=`<div class="field"><label>Photo</label><input type="file" id="photoFile" accept="image/*"><img id="preview" class="preview" src="${x.photo||''}" style="${x.photo?'display:block':''}"></div>
+  let h=`<div class="field"><label>Photo</label><input type="file" id="photoFile" accept="image/*"><img id="preview" class="preview" src="${x.photo||''}" style="${x.photo?'display:block':''}"><div style="display:flex;gap:8px;margin-top:9px"><button type="button" class="secondary" id="aiAnalyseBtn" onclick="analyseClothingPhoto()" ${x.photo?'':'disabled'}>Analyse photo with AI</button><button type="button" class="secondary" onclick="configureAIEndpoint()">AI settings</button></div><div id="aiStatus" class="sub" aria-live="polite">${x.photo?'Ready to analyse this photo.':'Upload a photo to get AI suggestions.'}</div></div>
   <div class="field"><label>Name</label><input name="name" required placeholder="e.g. Stone baggy jeans" value="${esc(x.name||'')}"></div>`;
   if(k==='item'){
-    h+=`<div class="field"><label>Type</label><input name="type" placeholder="Jeans, jumper, jacket…" value="${esc(x.type||'')}"></div>
+    h+=`<div class="field"><label>Brand (if known)</label><input name="brand" placeholder="e.g. Zara" value="${esc(x.brand||'')}"></div>
+    <div class="field"><label>Type</label><input name="type" placeholder="Jeans, jumper, jacket…" value="${esc(x.type||'')}"></div>
     <div class="field"><label>Colour (choose any)</label>${checks('colours',colourOptions,itemColours(x))}</div>
     <div class="field"><label>Status</label><select name="status">${statuses.map(s=>`<option ${((x.status||status||'Owned')===s)?'selected':''}>${s}</option>`).join('')}</select></div>
     <div class="field"><label>Where would you wear it? (choose any)</label>${checks('contexts',contexts,x.contexts||[])}</div>
+    <div class="field"><label>Seasons (choose any)</label>${checks('seasons',['Spring','Summer','Autumn','Winter','Holiday','All year'],itemSeasons(x))}</div>
     <div class="field"><label>Fresh trim / Hat</label><select name="suitability">
       <option ${((x.suitability||legacySuitability(x))==='Fresh trim')?'selected':''}>Fresh trim</option>
       <option ${((x.suitability||legacySuitability(x))==='Hat needed')?'selected':''}>Hat needed</option>
@@ -107,15 +110,57 @@ function openForm(k,status='',id=''){
       newPhoto=await compress(e.target.files[0]);
       $('preview').src=newPhoto;
       $('preview').style.display='block';
+      $('aiAnalyseBtn').disabled=false;
+      $('aiStatus').textContent='Photo ready. Analyse it to get suggested details.';
     }
   };
 }
+
+function configureAIEndpoint(){
+  const current=localStorage.getItem('wardrobe-ai-endpoint')||'';
+  const value=prompt('Paste your secure Cloudflare AI Worker URL (it looks like https://wardrobe-studio-ai.yourname.workers.dev):',current);
+  if(value===null)return false;
+  const endpoint=value.trim();
+  if(!/^https:\/\/[a-z0-9.-]+\.workers\.dev(?:\/.*)?$/i.test(endpoint)){alert('Please enter your HTTPS Cloudflare Workers URL.');return false}
+  localStorage.setItem('wardrobe-ai-endpoint',endpoint.replace(/\/+$/,''));
+  if($('aiStatus'))$('aiStatus').textContent='AI connection saved on this device.';
+  return true;
+}
+async function analyseClothingPhoto(){
+  if(kind!=='item')return;
+  const image=newPhoto||(editing&&editing.photo)||'';
+  if(!image){alert('Upload a clothing photo first.');return}
+  let endpoint=localStorage.getItem('wardrobe-ai-endpoint');
+  if(!endpoint&&!configureAIEndpoint())return;
+  endpoint=localStorage.getItem('wardrobe-ai-endpoint');
+  const btn=$('aiAnalyseBtn'),status=$('aiStatus');
+  btn.disabled=true;btn.textContent='Analysing…';status.textContent='Looking at the clothing and preparing suggestions. This may take a few seconds.';
+  try{
+    const response=await fetch(endpoint,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({image})});
+    const data=await response.json().catch(()=>({}));
+    if(!response.ok)throw new Error(data.error||'AI analysis failed ('+response.status+').');
+    const result=data.result||data;
+    const setText=(name,value)=>{const el=$('editor').elements.namedItem(name);if(el&&value!==undefined&&value!==null)el.value=value};
+    setText('name',result.name||'');setText('brand',result.brand||'');setText('type',result.type||'');
+    const setChecks=(name,values)=>{const selected=new Set(Array.isArray(values)?values:[]);document.querySelectorAll('#editor input[name="'+name+'"]').forEach(el=>{el.checked=selected.has(el.value)})};
+    setChecks('colours',result.colours);setChecks('contexts',result.contexts);setChecks('seasons',result.seasons);
+    const suitability=$('editor').elements.namedItem('suitability');if(suitability)suitability.value=result.suitability||'Either';
+    status.textContent='Suggestions added below. Please check every field before saving.';
+    if(result.product_search_query){
+      const link=document.createElement('a');link.href='https://www.google.com/search?tbm=isch&q='+encodeURIComponent(result.product_search_query);link.target='_blank';link.rel='noopener noreferrer';link.textContent='Search Google Images for this item';link.style.display='inline-block';link.style.marginTop='7px';link.style.color='var(--ink)';link.style.fontWeight='600';
+      status.appendChild(document.createElement('br'));status.appendChild(link);
+    }
+    if(result.confidence==='low')status.textContent='Some details are uncertain. Please check the suggestions carefully.';
+  }catch(error){status.textContent=error.message||'Could not analyse this photo. You can still complete the form manually.'}
+  finally{btn.disabled=false;btn.textContent='Analyse photo with AI'}
+}
+
 function filterOutfitPicker(){let q=($('outfitItemSearch')?.value||'').toLowerCase(),t=$('outfitItemType')?.value||'All',selected=[...document.querySelectorAll('input[name="outfitColours"]:checked')].map(el=>el.value);document.querySelectorAll('#outfitItemPicker label').forEach(label=>{let colours=(label.dataset.colours||'').split('|').filter(Boolean),colourMatch=!selected.length||selected.some(c=>c==='Neutral'?colours.some(v=>neutralColours.includes(v)):colours.includes(c)),typeMatch=t==='All'||label.dataset.type===t,searchMatch=(label.dataset.name+' '+label.dataset.type+' '+colours.join(' ')).toLowerCase().includes(q);label.style.display=colourMatch&&typeMatch&&searchMatch?'':'none'})}
 function editRecord(id,fromDetail=false){let x=records.find(r=>r.id===id);if(x){returnToDetail=fromDetail;openForm(x.kind,'',id)}}
 async function deleteRecord(id){let x=records.find(r=>r.id===id);if(!x)return;let message=x.kind==='item'?'Delete “'+x.name+'” from your clothing? It will also be removed from any outfits that include it.':'Delete the outfit “'+x.name+'”?';if(!confirm(message))return;try{await removeRecord(id);records=await all();render();if($('outfitDetail').classList.contains('active'))go('outfits')}catch(e){alert('Could not delete this '+(x.kind==='item'?'clothing item':'outfit')+'. Please try again.')}}
 function closeForm(){$('modal').classList.remove('show')}
 function compress(file){return new Promise(resolve=>{let r=new FileReader();r.onload=()=>{let im=new Image();im.onload=()=>{let scale=Math.min(1,1400/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=im.width*scale;c.height=im.height*scale;c.getContext('2d').drawImage(im,0,0,c.width,c.height);resolve(c.toDataURL('image/jpeg',.8))};im.src=r.result};r.readAsDataURL(file)})}
-async function saveForm(e){e.preventDefault();let f=new FormData(e.target),old=editing||{},now=Date.now(),x={...old,id:old.id||uid(),kind,name:f.get('name').trim(),photo:newPhoto||old.photo||'',notes:f.get('notes')||'',created:old.created||old.updated||now,updated:now};if(kind==='item'){x.type=f.get('type')||'';x.colours=f.getAll('colours');x.status=f.get('status');x.contexts=f.getAll('contexts');x.suitability=f.get('suitability')||legacySuitability(old)}else{x.categories=f.getAll('categories');x.category=x.categories[0]||'';x.seasons=f.getAll('seasons');x.season=x.seasons[0]||'';x.status=f.get('status');x.itemIds=f.getAll('itemIds');x.suitability=f.get('suitability')||'Fresh trim'}await put(x);records=await all();closeForm();render();if(kind==='outfit'&&returnToDetail)showOutfitDetail(x.id);returnToDetail=false}
+async function saveForm(e){e.preventDefault();let f=new FormData(e.target),old=editing||{},now=Date.now(),x={...old,id:old.id||uid(),kind,name:f.get('name').trim(),photo:newPhoto||old.photo||'',notes:f.get('notes')||'',created:old.created||old.updated||now,updated:now};if(kind==='item'){x.brand=f.get('brand')||'';x.type=f.get('type')||'';x.colours=f.getAll('colours');x.status=f.get('status');x.contexts=f.getAll('contexts');x.seasons=f.getAll('seasons');x.suitability=f.get('suitability')||legacySuitability(old)}else{x.categories=f.getAll('categories');x.category=x.categories[0]||'';x.seasons=f.getAll('seasons');x.season=x.seasons[0]||'';x.status=f.get('status');x.itemIds=f.getAll('itemIds');x.suitability=f.get('suitability')||'Fresh trim'}await put(x);records=await all();closeForm();render();if(kind==='outfit'&&returnToDetail)showOutfitDetail(x.id);returnToDetail=false}
 function details(id){let x=records.find(r=>r.id===id);if(!x)return;if(x.kind==='outfit'){showOutfitDetail(id);return}let linked=records.filter(o=>o.kind==='outfit'&&(o.itemIds||[]).includes(id));alert(x.name+'\\n\\n'+(x.notes||'No notes')+'\\n\\nUsed in outfits: '+(linked.map(y=>y.name).join(', ')||'None linked yet'))}
 function showOutfitDetail(id){let x=records.find(r=>r.id===id&&r.kind==='outfit');if(!x)return;let pieces=(x.itemIds||[]).map(itemId=>records.find(i=>i.kind==='item'&&i.id===itemId)).filter(Boolean),seasons=outfitSeasons(x),categories=x.categories||(x.category?[x.category]:[]);let mainPhoto=x.photo?'<img class="detail-main-photo" src="'+x.photo+'" alt="'+esc(x.name)+' outfit photo">':'<div class="detail-main-placeholder">Add an outfit photo</div>';let itemCards=pieces.map(i=>'<article class="detail-item">'+(i.photo?'<img src="'+i.photo+'" alt="'+esc(i.name)+'">':'<div class="detail-item-placeholder">No photo saved</div>')+'<div class="detail-item-body"><div class="detail-item-name">'+esc(i.name)+'</div><div class="detail-item-meta">'+esc([i.type,...itemColours(i)].filter(Boolean).join(' · '))+'</div></div></article>').join('');$('outfitDetailContent').innerHTML='<div class="detail-hero">'+mainPhoto+'<div class="detail-body"><div class="detail-meta">'+esc([x.status,...categories].filter(Boolean).join(' · '))+'</div><h1 class="detail-title">'+esc(x.name)+'</h1><div class="pills">'+seasons.map(v=>'<span class="pill">'+esc(v)+'</span>').join('')+'</div><div class="detail-actions"><button class="primary" onclick="editRecord(&quot;'+x.id+'&quot;,true)">Edit outfit</button><button class="secondary" onclick="deleteRecord(&quot;'+x.id+'&quot;)">Delete</button></div></div></div><section class="detail-section"><h3>Clothing in this outfit</h3><div class="detail-items">'+(itemCards||'<div class="empty">No clothing items linked yet.</div>')+'</div></section>'+(x.notes?'<section class="detail-section"><h3>Notes</h3><div class="detail-notes">'+esc(x.notes)+'</div></section>':'');go('outfitDetail')}
 async function exportBackup(){let data={app:'Wardrobe Studio',version:1,created:new Date().toISOString(),records};let blob=new Blob([JSON.stringify(data)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='wardrobe-studio-backup-'+new Date().toISOString().slice(0,10)+'.json';a.click();URL.revokeObjectURL(url)}
