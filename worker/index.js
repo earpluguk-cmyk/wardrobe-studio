@@ -1,5 +1,5 @@
 const ALLOWED_ORIGIN = "https://earpluguk-cmyk.github.io";
-const MODEL = "gpt-6-luna";
+const MODEL = "gpt-5.4-mini";
 const MAX_IMAGE_CHARS = 2_400_000;
 const schema = {
   type: "object", additionalProperties: false,
