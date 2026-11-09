@@ -24,7 +24,7 @@ Do not put the OpenAI API key into Wardrobe Studio, GitHub, or this repository. 
 
 ## API key and costs
 
-Create an API key in the OpenAI developer platform and enable API billing. ChatGPT subscriptions do not include API usage. Image analysis is billed separately by OpenAI; the model is gpt-6-luna and the image is sent at low detail to keep usage economical. Check current pricing before use.
+Create an API key in the OpenAI developer platform and enable API billing. ChatGPT subscriptions do not include API usage. Image analysis is billed separately by OpenAI; the model is gpt-5.4-mini and the image is sent at low detail to keep usage economical. Check current pricing before use.
 
 ## Notes
 
