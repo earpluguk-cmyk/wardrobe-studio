@@ -56,10 +56,60 @@ function toggleOutfitSeasonFilter(tag){let i=outfitSeasonFilters.indexOf(tag);if
 function toggleSuitabilityFilter(tag){let i=suitabilityFilters.indexOf(tag);if(i<0)suitabilityFilters.push(tag);else suitabilityFilters.splice(i,1);renderOutfits()}
 function renderWish(){$('wishGrid').innerHTML=records.filter(x=>x.kind==='item'&&x.status!=='Owned').map(tile).join('')||empty('Your wishlist is clear','Save items you want to buy here.')}
 function checks(name,opts,sel=[]){return '<div class="checks">'+opts.map(o=>'<label><input type="checkbox" name="'+name+'" value="'+o+'" '+(sel.includes(o)?'checked':'')+'> '+o+'</label>').join('')+'</div>'}
-function openForm(k,status='',id=''){kind=k;editing=records.find(x=>x.id===id)||null;newPhoto='';let x=editing||{};$('modalTitle').textContent=editing?'Edit '+k:(k==='item'?'Add clothing':'Create outfit');let h='<div class="field"><label>Photo</label><input type="file" id="photoFile" accept="image/*"><img id="preview" class="preview" src="'+(x.photo||'')+'" style="'+(x.photo?'display:block':'')+'"></div><div class="field"><label>Name</label><input name="name" required placeholder="e.g. Stone baggy jeans" value="'+esc(x.name||'')+'"></div>';
-if(k==='item'){h+='<div class="field"><label>Type</label><input name="type" placeholder="Jeans, jumper, jacket…" value="'+esc(x.type||'')+'"></div><div class="field"><label>Colour (choose any)</label>'+checks('colours',colourOptions,itemColours(x))+'</div><div class="field"><label>Status</label><select name="status">'+statuses.map(s=>'<option '+((x.status||status||'Owned')===s?'selected':'')+'>'+s+'</option>').join('')+'</select></div><div class="field"><label>Where would you wear it? (choose any)</label>'+checks('contexts',contexts,x.contexts||[])+'</div><div class="field"><label>Fresh trim / Hat</label><select name="suitability"><option '+((x.suitability||legacySuitability(x))==='Fresh trim'?'selected':'')+'>Fresh trim</option><option '+((x.suitability||legacySuitability(x))==='Hat needed'?'selected':'')+'>Hat needed</option><option '+((x.suitability||legacySuitability(x))==='Either'?'selected':'')+'>Either</option></select></div>'}
-else{h+='<div class="field"><label>Categories (choose any)</label>'+checks('categories',contexts,x.categories||(x.category?[x.category]:[]))+'</div><div class="field"><label>Seasons (choose any)</label>'+checks('seasons',['Spring','Summer','Autumn','Winter','Holiday','All year'],outfitSeasons(x))</div><div class="field"><label>Progress</label><select name="status">'+['Idea','In progress','Ready'].map(s=>'<option '+((x.status||'Idea')===s?'selected':'')+'>'+s+'</option>').join('')+'</select></div><div class="field"><label>Find pieces for this outfit</label><input id="outfitItemSearch" placeholder="Search jeans, jumpers, colours…" oninput="filterOutfitPicker()"><select id="outfitItemType" style="margin-top:8px" onchange="filterOutfitPicker()"><option value="All">All types</option>'+[...new Set(records.filter(i=>i.kind==='item').map(i=>(i.type||'').trim()).filter(Boolean))].sort().map(t=>'<option>'+esc(t)+'</option>').join('')+'</select><div class="sub" style="margin-top:9px">Colour (choose any)</div><div id="outfitColourPicker" class="checks" style="margin-top:7px">'+['Neutral',...colourOptions].map(c=>'<label><input type="checkbox" name="outfitColours" value="'+c+'" onchange="filterOutfitPicker()"> '+c+'</label>').join('')+'</div><div id="outfitItemPicker" class="outfit-pick-grid" style="margin-top:10px">'+records.filter(i=>i.kind==='item').sort((a,b)=>(b.created||b.updated||0)-(a.created||a.updated||0)).map(i=>'<label class="outfit-pick-card" data-name="'+esc(i.name)+'" data-type="'+esc(i.type||'')+'" data-colours="'+esc(itemColours(i).join('|'))+'"><input type="checkbox" name="itemIds" value="'+i.id+'" '+((x.itemIds||[]).includes(i.id)?'checked':'')+'><span class="outfit-pick-photo">'+(i.photo?'<img src="'+esc(i.photo)+'" alt="'+esc(i.name)+'">':'<span class="outfit-pick-placeholder">No photo</span>')+'</span><span class="outfit-pick-name">'+esc(i.name)+'</span><span class="sub">'+esc([i.type,...itemColours(i)].filter(Boolean).join(' · '))+'</span></label>').join('')+'</div></div>'+'<div class="field"><label>Fresh trim / Hat</label><select name="suitability"><option '+((x.suitability||legacySuitability(x))==='Fresh trim'?'selected':'')+'>Fresh trim</option><option '+((x.suitability||legacySuitability(x))==='Hat needed'?'selected':'')+'>Hat needed</option><option '+((x.suitability||legacySuitability(x))==='Either'?'selected':'')+'>Either</option></select></div>'}
-h+='<div class="field"><label>Notes (fit, styling, etc.)</label><textarea name="notes" placeholder="Fit, styling details…">'+esc(x.notes||'')+'</textarea></div>';$('fields').innerHTML=h;$('modal').classList.add('show');$('photoFile').onchange=async e=>{if(e.target.files[0]){newPhoto=await compress(e.target.files[0]);$('preview').src=newPhoto;$('preview').style.display='block'}}}
+function openForm(k,status='',id=''){
+  kind=k;
+  editing=records.find(x=>x.id===id)||null;
+  newPhoto='';
+  const x=editing||{};
+  $('modalTitle').textContent=editing?'Edit '+k:(k==='item'?'Add clothing':'Create outfit');
+  let h=`<div class="field"><label>Photo</label><input type="file" id="photoFile" accept="image/*"><img id="preview" class="preview" src="${x.photo||''}" style="${x.photo?'display:block':''}"></div>
+  <div class="field"><label>Name</label><input name="name" required placeholder="e.g. Stone baggy jeans" value="${esc(x.name||'')}"></div>`;
+  if(k==='item'){
+    h+=`<div class="field"><label>Type</label><input name="type" placeholder="Jeans, jumper, jacket…" value="${esc(x.type||'')}"></div>
+    <div class="field"><label>Colour (choose any)</label>${checks('colours',colourOptions,itemColours(x))}</div>
+    <div class="field"><label>Status</label><select name="status">${statuses.map(s=>`<option ${((x.status||status||'Owned')===s)?'selected':''}>${s}</option>`).join('')}</select></div>
+    <div class="field"><label>Where would you wear it? (choose any)</label>${checks('contexts',contexts,x.contexts||[])}</div>
+    <div class="field"><label>Fresh trim / Hat</label><select name="suitability">
+      <option ${((x.suitability||legacySuitability(x))==='Fresh trim')?'selected':''}>Fresh trim</option>
+      <option ${((x.suitability||legacySuitability(x))==='Hat needed')?'selected':''}>Hat needed</option>
+      <option ${((x.suitability||legacySuitability(x))==='Either')?'selected':''}>Either</option>
+    </select></div>`;
+  }else{
+    const types=[...new Set(records.filter(i=>i.kind==='item').map(i=>(i.type||'').trim()).filter(Boolean))].sort();
+    const picker=records.filter(i=>i.kind==='item').sort((a,b)=>(b.created||b.updated||0)-(a.created||a.updated||0)).map(i=>`
+      <label class="outfit-pick-card" data-name="${esc(i.name)}" data-type="${esc(i.type||'')}" data-colours="${esc(itemColours(i).join('|'))}">
+        <input type="checkbox" name="itemIds" value="${i.id}" ${(x.itemIds||[]).includes(i.id)?'checked':''}>
+        <span class="outfit-pick-photo">${i.photo?'<img src="'+esc(i.photo)+'" alt="'+esc(i.name)+'">':'<span class="outfit-pick-placeholder">No photo</span>'}</span>
+        <span class="outfit-pick-name">${esc(i.name)}</span>
+        <span class="sub">${esc([i.type,...itemColours(i)].filter(Boolean).join(' · '))}</span>
+      </label>`).join('');
+    h+=`<div class="field"><label>Categories (choose any)</label>${checks('categories',contexts,x.categories||(x.category?[x.category]:[]))}</div>
+    <div class="field"><label>Seasons (choose any)</label>${checks('seasons',['Spring','Summer','Autumn','Winter','Holiday','All year'],outfitSeasons(x))}</div>
+    <div class="field"><label>Progress</label><select name="status">${['Idea','In progress','Ready'].map(s=>`<option ${(x.status||'Idea')===s?'selected':''}>${s}</option>`).join('')}</select></div>
+    <div class="field"><label>Find pieces for this outfit</label>
+      <input id="outfitItemSearch" placeholder="Search jeans, jumpers, colours…" oninput="filterOutfitPicker()">
+      <select id="outfitItemType" style="margin-top:8px" onchange="filterOutfitPicker()"><option value="All">All types</option>${types.map(t=>'<option>'+esc(t)+'</option>').join('')}</select>
+      <div class="sub" style="margin-top:9px">Colour (choose any)</div>
+      <div id="outfitColourPicker" class="checks" style="margin-top:7px">${['Neutral',...colourOptions].map(c=>`<label><input type="checkbox" name="outfitColours" value="${c}" onchange="filterOutfitPicker()"> ${c}</label>`).join('')}</div>
+      <div id="outfitItemPicker" class="outfit-pick-grid" style="margin-top:10px">${picker}</div>
+    </div>
+    <div class="field"><label>Fresh trim / Hat</label><select name="suitability">
+      <option ${((x.suitability||legacySuitability(x))==='Fresh trim')?'selected':''}>Fresh trim</option>
+      <option ${((x.suitability||legacySuitability(x))==='Hat needed')?'selected':''}>Hat needed</option>
+      <option ${((x.suitability||legacySuitability(x))==='Either')?'selected':''}>Either</option>
+    </select></div>`;
+  }
+  h+=`<div class="field"><label>Notes (fit, styling, etc.)</label><textarea name="notes" placeholder="Fit, styling details…">${esc(x.notes||'')}</textarea></div>`;
+  $('fields').innerHTML=h;
+  $('modal').classList.add('show');
+  $('photoFile').onchange=async e=>{
+    if(e.target.files[0]){
+      newPhoto=await compress(e.target.files[0]);
+      $('preview').src=newPhoto;
+      $('preview').style.display='block';
+    }
+  };
+}
 function filterOutfitPicker(){let q=($('outfitItemSearch')?.value||'').toLowerCase(),t=$('outfitItemType')?.value||'All',selected=[...document.querySelectorAll('input[name="outfitColours"]:checked')].map(el=>el.value);document.querySelectorAll('#outfitItemPicker label').forEach(label=>{let colours=(label.dataset.colours||'').split('|').filter(Boolean),colourMatch=!selected.length||selected.some(c=>c==='Neutral'?colours.some(v=>neutralColours.includes(v)):colours.includes(c)),typeMatch=t==='All'||label.dataset.type===t,searchMatch=(label.dataset.name+' '+label.dataset.type+' '+colours.join(' ')).toLowerCase().includes(q);label.style.display=colourMatch&&typeMatch&&searchMatch?'':'none'})}
 function editRecord(id,fromDetail=false){let x=records.find(r=>r.id===id);if(x){returnToDetail=fromDetail;openForm(x.kind,'',id)}}
 async function deleteRecord(id){let x=records.find(r=>r.id===id);if(!x)return;let message=x.kind==='item'?'Delete “'+x.name+'” from your clothing? It will also be removed from any outfits that include it.':'Delete the outfit “'+x.name+'”?';if(!confirm(message))return;try{await removeRecord(id);records=await all();render();if($('outfitDetail').classList.contains('active'))go('outfits')}catch(e){alert('Could not delete this '+(x.kind==='item'?'clothing item':'outfit')+'. Please try again.')}}
