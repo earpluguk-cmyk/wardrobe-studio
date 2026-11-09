@@ -125,8 +125,37 @@ async function saveForm(e){e.preventDefault();let f=new FormData(e.target),old=e
 function details(id){let x=records.find(r=>r.id===id);if(!x)return;if(x.kind==='outfit'){showOutfitDetail(id);return}let linked=records.filter(o=>o.kind==='outfit'&&(o.itemIds||[]).includes(id));alert(x.name+'\\n\\n'+(x.notes||'No notes')+'\\n\\nUsed in outfits: '+(linked.map(y=>y.name).join(', ')||'None linked yet'))}
 let currentDetailId=null;function showOutfitDetail(id){currentDetailId=id;let x=records.find(r=>r.id===id&&r.kind==='outfit');if(!x)return;let pieces=(x.itemIds||[]).map(itemId=>records.find(i=>i.kind==='item'&&i.id===itemId)).filter(Boolean),seasons=outfitSeasons(x),categories=x.categories||(x.category?[x.category]:[]);let mainPhoto=x.photo?'<img class="detail-main-photo" src="'+x.photo+'" alt="'+esc(x.name)+' outfit photo">':'<div class="detail-main-placeholder">Add an outfit photo</div>';let itemCards=pieces.map(i=>'<article class="detail-item">'+(i.photo?'<img src="'+i.photo+'" alt="'+esc(i.name)+'">':'<div class="detail-item-placeholder">No photo saved</div>')+'<div class="detail-item-body"><div class="detail-item-name">'+esc(i.name)+'</div><div class="detail-item-meta">'+esc([i.type,...itemColours(i)].filter(Boolean).join(' · '))+'</div></div></article>').join('');$('outfitDetailContent').innerHTML='<div class="detail-hero">'+mainPhoto+'<div class="detail-body"><div class="detail-meta">'+esc([x.status,...categories].filter(Boolean).join(' · '))+'</div><h1 class="detail-title">'+esc(x.name)+'</h1><div class="pills">'+seasons.map(v=>'<span class="pill">'+esc(v)+'</span>').join('')+'</div><div class="detail-actions"><button class="primary" onclick="editRecord(&quot;'+x.id+'&quot;,true)">Edit outfit</button><button class="secondary" onclick="duplicateOutfit(&quot;'+x.id+'&quot;)">Duplicate</button><button class="secondary" onclick="deleteRecord(&quot;'+x.id+'&quot;)">Delete</button></div></div></div><section class="detail-section"><h3>Clothing in this outfit</h3><div class="detail-items">'+(itemCards||'<div class="empty">No clothing items linked yet.</div>')+'</div></section>'+(x.notes?'<section class="detail-section"><h3>Notes</h3><div class="detail-notes">'+esc(x.notes)+'</div></section>':'');go('outfitDetail')}
 async function duplicateOutfit(id){let x=records.find(r=>r.id===id&&r.kind==='outfit');if(!x)return;let copy={...x,id:uid(),name:(x.name||'Outfit')+' (copy)',created:Date.now(),updated:Date.now()};await put(copy);records=await all();render();showOutfitDetail(copy.id)}
+async function createTrip(){
+ const name=prompt('Trip name','Holiday'); if(!name||!name.trim())return;
+ const days=Number(prompt('How many days?','7')); if(!Number.isInteger(days)||days<1||days>60){alert('Enter 1–60 days.');return}
+ const trip={id:uid(),kind:'trip',name:name.trim(),days:days,plan:{},created:Date.now(),updated:Date.now()};
+ await put(trip);records=await all();renderTrips();
+}
+function renderTrips(){
+ const trips=records.filter(x=>x.kind==='trip');
+ const ready=records.filter(x=>x.kind==='outfit'&&x.status==='Ready');
+ $('tripList').innerHTML=trips.map(t=>{
+  let html='<div class="backup"><h3>'+esc(t.name)+'</h3><p>'+t.days+' days</p></div>';
+  for(let day=0;day<t.days;day++){
+   html+='<div class="trip-day"><h3>Day '+(day+1)+'</h3>';
+   ['Day outfit','Evening outfit','Beach outfit','Swimming outfit','Sleepwear'].forEach(slot=>{
+    const selected=t.plan&&t.plan[day]&&t.plan[day][slot]||'';
+    html+='<div class="trip-slot"><strong>'+slot+'</strong><select data-trip="'+t.id+'" data-day="'+day+'" data-slot="'+slot+'" onchange="setTripOutfit(this)"><option value="">Choose outfit</option>'+ready.map(o=>'<option value="'+o.id+'" '+(o.id===selected?'selected':'')+'>'+esc(o.name)+'</option>').join('')+'</select></div>';
+   });
+   html+='</div>';
+  }
+  return html;
+ }).join('')||empty('No holidays planned yet','Create a trip to start planning outfits.');
+}
+async function setTripOutfit(el){
+ const trip=records.find(x=>x.id===el.dataset.trip);if(!trip)return;
+ trip.plan=trip.plan||{};trip.plan[el.dataset.day]=trip.plan[el.dataset.day]||{};
+ if(el.value)trip.plan[el.dataset.day][el.dataset.slot]=el.value;else delete trip.plan[el.dataset.day][el.dataset.slot];
+ trip.updated=Date.now();await put(trip);records=await all();renderTrips();
+}
+
 async function exportBackup(){let data={app:'Wardrobe Studio',version:1,created:new Date().toISOString(),records};let blob=new Blob([JSON.stringify(data)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='wardrobe-studio-backup-'+new Date().toISOString().slice(0,10)+'.json';a.click();URL.revokeObjectURL(url)}
 async function restoreBackup(){let f=$('restoreFile').files[0];if(!f)return alert('Choose a backup file first.');if(!confirm('This replaces your current wardrobe. Have you saved a backup of it?'))return;try{let d=JSON.parse(await f.text());if(d.app!=='Wardrobe Studio'||!Array.isArray(d.records))throw Error();let tx=db.transaction(STORE,'readwrite'),s=tx.objectStore(STORE);s.clear();d.records.forEach(x=>s.put(x));tx.oncomplete=async()=>{records=await all();render();alert('Backup restored.')};tx.onerror=()=>alert('Restore failed.')}catch(e){alert('That backup file could not be read.')}}
 function storageInfo(){let n=records.reduce((a,x)=>a+(x.photo?.length||0)*.75,0);$('storageInfo').textContent='Approx. '+(n/1048576).toFixed(1)+' MB stored in this browser. Browser storage limits vary.'}
-(async()=>{localStorage.removeItem('wardrobe-ai-endpoint');await openDB();records=await all();render();storageInfo();if('serviceWorker'in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>{})})().catch(()=>alert('Could not open local storage. Please use Safari.'));
+(async()=>{localStorage.removeItem('wardrobe-ai-endpoint');await openDB();records=await all();render();renderTrips();storageInfo();if('serviceWorker'in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>{})})().catch(()=>alert('Could not open local storage. Please use Safari.'));
 </script></body></html>
