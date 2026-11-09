@@ -1,0 +1,16 @@
+{
+  "name": "Wardrobe Studio",
+  "short_name": "Wardrobe",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#f5f3ef",
+  "theme_color": "#f5f3ef",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
