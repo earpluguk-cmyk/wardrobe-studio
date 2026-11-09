@@ -63,7 +63,7 @@ function openForm(k,status='',id=''){
   newPhoto='';
   const x=editing||{};
   $('modalTitle').textContent=editing?'Edit '+k:(k==='item'?'Add clothing':'Create outfit');
-  let h=`<div class="field"><label>Photo</label><input type="file" id="photoFile" accept="image/*"><img id="preview" class="preview" src="${x.photo||''}" style="${x.photo?'display:block':''}"><div style="display:flex;gap:8px;margin-top:9px"><button type="button" class="secondary" id="aiAnalyseBtn" onclick="analyseClothingPhoto()" ${x.photo?'':'disabled'}>Analyse photo with AI</button><button type="button" class="secondary" onclick="configureAIEndpoint()">AI settings</button></div><div id="aiStatus" class="sub" aria-live="polite">${x.photo?'Ready to analyse this photo.':'Upload a photo to get AI suggestions.'}</div></div>
+  let h=`<div class="field"><label>Photo</label><input type="file" id="photoFile" accept="image/*"><img id="preview" class="preview" src="${x.photo||''}" style="${x.photo?'display:block':''}"><div style="${k==='item'?'display:flex;gap:8px;margin-top:9px':'display:none'}"><button type="button" class="secondary" id="aiAnalyseBtn" onclick="analyseClothingPhoto()" ${x.photo?'':'disabled'}>Analyse photo with AI</button><button type="button" class="secondary" onclick="configureAIEndpoint()">AI settings</button></div><div id="aiStatus" class="sub" aria-live="polite">${x.photo?'Ready to analyse this photo.':'Upload a photo to get AI suggestions.'}</div></div>
   <div class="field"><label>Name</label><input name="name" required placeholder="e.g. Stone baggy jeans" value="${esc(x.name||'')}"></div>`;
   if(k==='item'){
     h+=`<div class="field"><label>Brand (if known)</label><input name="brand" placeholder="e.g. Zara" value="${esc(x.brand||'')}"></div>
@@ -146,11 +146,11 @@ async function analyseClothingPhoto(){
     setChecks('colours',result.colours);setChecks('contexts',result.contexts);setChecks('seasons',result.seasons);
     const suitability=$('editor').elements.namedItem('suitability');if(suitability)suitability.value=result.suitability||'Either';
     status.textContent='Suggestions added below. Please check every field before saving.';
+    if(result.confidence==='low')status.textContent='Some details are uncertain. Please check the suggestions carefully.';
     if(result.product_search_query){
       const link=document.createElement('a');link.href='https://www.google.com/search?tbm=isch&q='+encodeURIComponent(result.product_search_query);link.target='_blank';link.rel='noopener noreferrer';link.textContent='Search Google Images for this item';link.style.display='inline-block';link.style.marginTop='7px';link.style.color='var(--ink)';link.style.fontWeight='600';
       status.appendChild(document.createElement('br'));status.appendChild(link);
     }
-    if(result.confidence==='low')status.textContent='Some details are uncertain. Please check the suggestions carefully.';
   }catch(error){status.textContent=error.message||'Could not analyse this photo. You can still complete the form manually.'}
   finally{btn.disabled=false;btn.textContent='Analyse photo with AI'}
 }
