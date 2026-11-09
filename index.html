@@ -28,25 +28,25 @@ function tile(x){
   const isOutfit=x.kind==='outfit';
   const categories=isOutfit?(x.categories||(x.category?[x.category]:[])):(x.contexts||[]);
   const seasons=isOutfit?outfitSeasons(x):[];
-  const tags=isOutfit?[x.status,x.suitability||legacySuitability(x),...categories,...seasons]:[...categories,...itemSeasons(x),x.suitability||legacySuitability(x)];
+  const tags=isOutfit?[x.status,x.suitability||legacySuitability(x),...categories,...seasons]:[...(x.archived?['Archived']:[]),...categories,...itemSeasons(x),x.suitability||legacySuitability(x)];
   const subtitle=isOutfit?[categories.join(' · '),seasons.join(' · ')].filter(Boolean).join(' · '):([x.brand,x.type,x.status].filter(Boolean).join(' · '));
   const photo=x.photo?'<img class="photo" src="'+x.photo+'" alt="'+esc(x.name)+'">':'<div class="placeholder">Add a photo</div>';
   const pills=tags.slice(0,5).map(tag=>'<span class="pill">'+esc(tag)+'</span>').join('');
   const click=isOutfit?' onclick="details(&quot;'+x.id+'&quot;)" role="button" tabindex="0"':'';
-  return '<article class="tile"'+click+'>'+photo+'<div class="tilebody"><div class="tiletitle">'+esc(x.name)+'</div><div class="sub">'+esc(subtitle)+'</div><div class="pills">'+pills+'</div><div class="actions"><button onclick="event.stopPropagation();editRecord(&quot;'+x.id+'&quot;)">Edit</button><button onclick="event.stopPropagation();details(&quot;'+x.id+'&quot;)">Details</button><button class="delete" onclick="event.stopPropagation();deleteRecord(&quot;'+x.id+'&quot;)">Delete</button></div></div></article>';
+  return '<article class="tile"'+click+'>'+photo+'<div class="tilebody"><div class="tiletitle">'+esc(x.name)+'</div><div class="sub">'+esc(subtitle)+'</div><div class="pills">'+pills+'</div><div class="actions"><button onclick="event.stopPropagation();editRecord(&quot;'+x.id+'&quot;)">Edit</button><button onclick="event.stopPropagation();details(&quot;'+x.id+'&quot;)">Details</button>'+(isOutfit?'':'<button onclick="event.stopPropagation();toggleArchive(&quot;'+x.id+'&quot;)">'+(x.archived?'Restore':'Archive')+'</button>')+<button class="delete" onclick="event.stopPropagation();deleteRecord(&quot;'+x.id+'&quot;)">Delete</button></div></div></article>';
 }
-function render(){let it=records.filter(x=>x.kind==='item'),os=records.filter(x=>x.kind==='outfit');$('nItems').textContent=it.length;$('nOutfits').textContent=os.filter(x=>x.status==='Ready').length;$('nWish').textContent=it.filter(x=>x.status!=='Owned').length+os.filter(x=>x.status!=='Ready').length;$('recent').innerHTML=it.slice(-4).reverse().map(tile).join('')||empty('Your wardrobe starts here','Add a photo of your first piece.');$('homeLooks').innerHTML=os.filter(x=>x.status==='Ready').slice(-2).reverse().map(tile).join('')||empty('No ready outfits yet','Move an outfit to Ready when it is complete.');renderItems();renderOutfits();renderWish()}
+function render(){let it=records.filter(x=>x.kind==='item'&&!x.archived),os=records.filter(x=>x.kind==='outfit');$('nItems').textContent=it.length;$('nOutfits').textContent=os.filter(x=>x.status==='Ready').length;$('nWish').textContent=it.filter(x=>x.status!=='Owned').length+os.filter(x=>x.status!=='Ready').length;$('recent').innerHTML=it.slice(-4).reverse().map(tile).join('')||empty('Your wardrobe starts here','Add a photo of your first piece.');$('homeLooks').innerHTML=os.filter(x=>x.status==='Ready').slice(-2).reverse().map(tile).join('')||empty('No ready outfits yet','Move an outfit to Ready when it is complete.');renderItems();renderOutfits();renderWish()}
 function itemColours(x){return Array.isArray(x.colours)?x.colours:(x.colour?[x.colour]:[])}
 function itemSeasons(x){return Array.isArray(x.seasons)?x.seasons:(x.season?[x.season]:[])}
 function matchesColour(x,filter){let cs=itemColours(x);if(filter==='All colours')return true;if(filter==='Neutral')return cs.some(c=>neutralColours.includes(c));return cs.includes(filter)}
 function renderItems(){
- let q=($('itemQ').value||'').toLowerCase(),items=records.filter(x=>x.kind==='item');
- $('itemChips').innerHTML=['All',...contexts].map(c=>'<button class="chip '+(itemFilter===c?'active':'')+'" onclick="itemFilter=\''+c+'\';renderItems()">'+c+'</button>').join('');
+ let q=($('itemQ').value||'').toLowerCase(),items=records.filter(x=>x.kind==='item'&&(itemFilter==='Archived'?x.archived:!x.archived));
+ $('itemChips').innerHTML=['All',...contexts,'Archived'].map(c=>'<button class="chip '+(itemFilter===c?'active':'')+'" onclick="itemFilter=\''+c+'\';renderItems()">'+c+'</button>').join('');
  let types=[...new Set(items.map(x=>(x.type||'').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
  $('typeChips').innerHTML=['All types',...types].map(t=>'<button class="chip '+((typeFilter===(t==='All types'?'All':t))?'active':'')+'" onclick="typeFilter=\''+(t==='All types'?'All':esc(t))+'\';renderItems()">'+esc(t)+'</button>').join('');
  $('colourChips').innerHTML=['All colours','Neutral',...colourOptions].map(c=>'<button class="chip '+(colourFilter===c?'active':'')+'" onclick="colourFilter=\''+c+'\';renderItems()">'+c+'</button>').join('');
  $('itemSort').value=itemSort;
- let a=items.filter(x=>(itemFilter==='All'||(x.contexts||[]).includes(itemFilter))&&(typeFilter==='All'||(x.type||'').trim()===typeFilter)&&matchesColour(x,colourFilter)&&[x.name,x.brand,x.type,x.status,x.notes,...(x.contexts||[]),...itemColours(x),...itemSeasons(x)].join(' ').toLowerCase().includes(q));
+ let a=items.filter(x=>(itemFilter==='All'||itemFilter==='Archived'||(x.contexts||[]).includes(itemFilter))&&(typeFilter==='All'||(x.type||'').trim()===typeFilter)&&matchesColour(x,colourFilter)&&[x.name,x.brand,x.type,x.status,x.notes,...(x.contexts||[]),...itemColours(x),...itemSeasons(x)].join(' ').toLowerCase().includes(q));
  a.sort((x,y)=>itemSort==='az'?(x.name||'').localeCompare(y.name||''):itemSort==='oldest'?(x.created||x.updated||0)-(y.created||y.updated||0):(y.created||y.updated||0)-(x.created||x.updated||0));
  $('itemGrid').innerHTML=a.map(tile).join('')||empty('Nothing here yet','Add a piece or try another search.')
 }
@@ -55,7 +55,8 @@ function renderOutfits(){let q=($('outfitQ').value||'').toLowerCase();$('outfitC
 function toggleOutfitFilter(tag){let i=outfitFilters.indexOf(tag);if(i<0)outfitFilters.push(tag);else outfitFilters.splice(i,1);renderOutfits()}
 function toggleOutfitSeasonFilter(tag){let i=outfitSeasonFilters.indexOf(tag);if(i<0)outfitSeasonFilters.push(tag);else outfitSeasonFilters.splice(i,1);renderOutfits()}
 function toggleSuitabilityFilter(tag){let i=suitabilityFilters.indexOf(tag);if(i<0)suitabilityFilters.push(tag);else suitabilityFilters.splice(i,1);renderOutfits()}
-function renderWish(){let outfits=records.filter(x=>x.kind==='outfit'&&x.status!=='Ready').sort((a,b)=>(b.updated||b.created||0)-(a.updated||a.created||0));let items=records.filter(x=>x.kind==='item'&&x.status!=='Owned');$('wishOutfitGrid').innerHTML=outfits.map(tile).join('')||empty('No outfits to finish','Outfit ideas and in-progress looks will appear here.');$('wishGrid').innerHTML=items.map(tile).join('')||empty('No clothing to find','Save items you want to buy here.') }
+async function toggleArchive(id){let x=records.find(r=>r.id===id&&r.kind==='item');if(!x)return;x.archived=!x.archived;x.updated=Date.now();await put(x);records=await all();render();}
+function renderWish(){let outfits=records.filter(x=>x.kind==='outfit'&&x.status!=='Ready').sort((a,b)=>(b.updated||b.created||0)-(a.updated||a.created||0));let items=records.filter(x=>x.kind==='item'&&!x.archived&&x.status!=='Owned');$('wishOutfitGrid').innerHTML=outfits.map(tile).join('')||empty('No outfits to finish','Outfit ideas and in-progress looks will appear here.');$('wishGrid').innerHTML=items.map(tile).join('')||empty('No clothing to find','Save items you want to buy here.') }
 function checks(name,opts,sel=[]){return '<div class="checks">'+opts.map(o=>'<label><input type="checkbox" name="'+name+'" value="'+o+'" '+(sel.includes(o)?'checked':'')+'> '+o+'</label>').join('')+'</div>'}
 function openForm(k,status='',id=''){
   kind=k;
@@ -78,8 +79,8 @@ function openForm(k,status='',id=''){
       <option ${((x.suitability||legacySuitability(x))==='Either')?'selected':''}>Either</option>
     </select></div>`;
   }else{
-    const types=[...new Set(records.filter(i=>i.kind==='item').map(i=>(i.type||'').trim()).filter(Boolean))].sort();
-    const picker=records.filter(i=>i.kind==='item').sort((a,b)=>(b.created||b.updated||0)-(a.created||a.updated||0)).map(i=>`
+    const types=[...new Set(records.filter(i=>i.kind==='item'&&!i.archived).map(i=>(i.type||'').trim()).filter(Boolean))].sort();
+    const picker=records.filter(i=>i.kind==='item'&&!i.archived).sort((a,b)=>(b.created||b.updated||0)-(a.created||a.updated||0)).map(i=>`
       <label class="outfit-pick-card" data-name="${esc(i.name)}" data-type="${esc(i.type||'')}" data-colours="${esc(itemColours(i).join('|'))}">
         <input type="checkbox" name="itemIds" value="${i.id}" ${(x.itemIds||[]).includes(i.id)?'checked':''}>
         <span class="outfit-pick-photo">${i.photo?'<img src="'+esc(i.photo)+'" alt="'+esc(i.name)+'">':'<span class="outfit-pick-placeholder">No photo</span>'}</span>
