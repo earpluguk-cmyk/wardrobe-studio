@@ -80,7 +80,7 @@ function openForm(k,status='',id=''){
     </select></div>`;
   }else{
     const types=[...new Set(records.filter(i=>i.kind==='item'&&!i.archived).map(i=>(i.type||'').trim()).filter(Boolean))].sort();
-    const picker=records.filter(i=>i.kind==='item'&&!i.archived).sort((a,b)=>(b.created||b.updated||0)-(a.created||a.updated||0)).map(i=>`
+    const picker=records.filter(i=>i.kind==='item'&&(!i.archived||(x.itemIds||[]).includes(i.id))).sort((a,b)=>(b.created||b.updated||0)-(a.created||a.updated||0)).map(i=>`
       <label class="outfit-pick-card" data-name="${esc(i.name)}" data-type="${esc(i.type||'')}" data-colours="${esc(itemColours(i).join('|'))}">
         <input type="checkbox" name="itemIds" value="${i.id}" ${(x.itemIds||[]).includes(i.id)?'checked':''}>
         <span class="outfit-pick-photo">${i.photo?'<img src="'+esc(i.photo)+'" alt="'+esc(i.name)+'">':'<span class="outfit-pick-placeholder">No photo</span>'}</span>
