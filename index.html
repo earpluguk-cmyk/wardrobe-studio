@@ -180,7 +180,7 @@ function toggleItemColour(el){const i=colourFilters.indexOf(el.value);if(i<0)col
 function renderItems(){
  let q=($('itemQ').value||'').toLowerCase(),items=records.filter(x=>x.kind==='item'&&(itemFilter==='Archived'?x.archived:!x.archived));
  replaceDropdowns('itemChips',filterDropdown('itemCategoryFilter','Category',[...contexts,'Archived'],[...itemContextFilters,...(itemFilter==='Archived'?['Archived']:[])],'toggleItemContext','All categories'));
- let types=[...new Set(items.map(x=>(x.type||'').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
+ let types=[...new Set(records.filter(x=>x.kind==='item').map(x=>(x.type||'').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
  replaceDropdowns('typeChips',filterDropdown('itemTypeFilter','Type',types,typeFilters,'toggleItemType','All types'));
  replaceDropdowns('colourChips',filterDropdown('itemColourFilter','Colour',['Neutral',...colourOptions],colourFilters,'toggleItemColour','All colours'));
  $('itemSort').value=itemSort;
