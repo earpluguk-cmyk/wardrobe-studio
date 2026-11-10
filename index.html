@@ -255,8 +255,7 @@ function openForm(k,status='',id=''){
       <option ${((x.suitability||legacySuitability(x))==='Fresh trim')?'selected':''}>Fresh trim</option>
       <option ${((x.suitability||legacySuitability(x))==='Hat needed')?'selected':''}>Hat needed</option>
       <option ${((x.suitability||legacySuitability(x))==='Either')?'selected':''}>Either</option>
-    </select></div>
-;
+    </select></div>`;
   }else{
     const types=[...new Set(records.filter(i=>i.kind==='item'&&!i.archived).map(i=>(i.type||'').trim()).filter(Boolean))].sort();
     const picker=records.filter(i=>i.kind==='item'&&(!i.archived||(x.itemIds||[]).includes(i.id))).sort((a,b)=>(b.created||b.updated||0)-(a.created||a.updated||0)).map(i=>`
