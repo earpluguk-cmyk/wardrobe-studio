@@ -286,7 +286,7 @@ function openForm(k,status='',id=''){
   let h=`<div class="field"><label>Photo</label><input type="file" id="photoFile" accept="image/*"><img id="preview" class="preview" src="${x.photo||''}" style="${x.photo?'display:block':''}"></div>
   <div class="field"><label>Name</label><input name="name" required placeholder="e.g. Stone baggy jeans" value="${esc(x.name||'')}"></div>`;
   if(k==='item'){
-    h+=`<div class="field"><label>Brand (if known)</label><input name="brand" placeholder="e.g. Zara" value="${esc(x.brand||'')}"></div>
+    h+=`<div class="field"><label>Brand</label><input name="brand" placeholder="e.g. Zara" value="${esc(x.brand||'')}"></div>
     <div class="field"><label>Type</label><input name="type" placeholder="Jeans, jumper, jacket…" value="${esc(x.type||'')}"></div>
     <div class="field"><label>Colour (choose any)</label>${checks('colours',colourOptions,itemColours(x))}</div>
     <div class="field"><label>Status</label><select name="status">${statuses.map(s=>`<option ${((x.status||status||'Owned')===s)?'selected':''}>${s}</option>`).join('')}</select></div>
