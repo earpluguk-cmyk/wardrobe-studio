@@ -183,9 +183,9 @@ function tile(x){
   const categories=isOutfit?(x.categories||(x.category?[x.category]:[])):(x.contexts||[]);
   const seasons=isOutfit?outfitSeasons(x):[];
   const tags=isOutfit?[x.status,x.suitability||legacySuitability(x),...categories,...seasons]:[...(x.archived?['Archived']:[]),...categories,...itemSeasons(x),x.suitability||legacySuitability(x)];
-  const subtitle=isOutfit?[categories.join(' · '),seasons.join(' · ')].filter(Boolean).join(' · '):([x.brand,x.type,x.status].filter(Boolean).join(' · '));
+  const subtitle=isOutfit?[x.status,categories.join(' · '),seasons.join(' · ')].filter(Boolean).join(' · '):([x.brand,x.type,x.status].filter(Boolean).join(' · '));
   const needsBuy=!isOutfit&&x.status==='Need to buy';
-  const photoContent=x.photo?'<img class="photo" src="'+x.photo+'" alt="'+esc(x.name)+'">':(isOutfit?outfitPlaceholder():'<div class="placeholder">Add a photo</div>');
+  const photoContent=x.photo?'<img class="photo" src="'+x.photo+'" alt="'+esc(x.name)+'">':(isOutfit?outfitPlaceholder():'<div class="placeholder"><strong style="font:42px Georgia,serif">?</strong></div>');
   const photo='<div class="tile-photo-wrap">'+photoContent+(needsBuy?'<span class="need-buy-badge"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 5.5h10l-.7 8H3.7L3 5.5Z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M5.5 6V4a2.5 2.5 0 0 1 5 0v2" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>NEEDS TO BUY</span>':'')+'</div>';
   const pills=tags.slice(0,5).map(tag=>'<span class="pill">'+esc(tag)+'</span>').join('');
   const click=' onclick="details(&quot;'+x.id+'&quot;)" role="button" tabindex="0"';
