@@ -185,6 +185,9 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 .need-find-options input{accent-color:#786956}.need-find-other{margin-top:10px}.need-find-other input{width:100%}.validation-confirm-note{padding:12px 13px;border:1px solid #e8e1d6;border-radius:12px;background:#f4f0e9;color:#6a6257;font-size:11px;line-height:1.5}
 @media(max-width:390px){.delete-confirm-sheet{padding:22px 18px 19px}.need-find-options{grid-template-columns:repeat(2,minmax(0,1fr))}}
 
+/* Status labels belong only in the dedicated outfit sections, never in Clothing in this outfit */
+.detail-items .need-buy-badge,.detail-items .ordered-badge,.detail-items .need-to-find-badge{display:none!important}
+.detail-items .detail-item.need-to-buy,.detail-items .detail-item.ordered-buy{border-color:inherit!important;box-shadow:none!important}
 /* Keep compact outfit status cards readable at every mobile width */
 .audit-card{min-width:0;max-width:100%;box-sizing:border-box;align-items:center;gap:9px}
 .audit-card>img,.audit-card>.audit-card-placeholder{width:58px;height:72px;flex:0 0 58px;object-fit:cover}
