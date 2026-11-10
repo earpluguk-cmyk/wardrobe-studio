@@ -263,7 +263,7 @@ function renderWish(){
 }
 function checks(name,opts,sel=[]){return '<div class="checks">'+opts.map(o=>'<label><input type="checkbox" name="'+name+'" value="'+o+'" '+(sel.includes(o)?'checked':'')+'> '+o+'</label>').join('')+'</div>'}
 const needToFindOptions=['Trainers','Jeans','Tracksuit bottoms','Tracksuit','Jumper','Hoodie','T-shirt','Jacket','Hat','Other'];
-function needToFindItems(x){return [...(Array.isArray(x.needToFind)?x.needToFind:[]).filter(v=>v!=='N/A'),...(x.needToFindOther&&Array.isArray(x.needToFind)&&x.needToFind.includes('Other')?['Other: '+x.needToFindOther]:[]),...(x.missingItems||[])].filter(Boolean)}
+function needToFindItems(x){const selected=Array.isArray(x.needToFind)?x.needToFind:[],items=selected.filter(v=>v!=='N/A'&&v!=='Other');if(selected.includes('Other'))items.push(x.needToFindOther?'Other: '+x.needToFindOther:'Other');return [...items,...(x.missingItems||[])].filter(Boolean)}
 function needToFindCount(x){return needToFindItems(x).length}
 function toggleNeedToFindOption(el){const inputs=[...document.querySelectorAll('input[name="needToFind"]')],na=inputs.find(i=>i.value==='N/A');if(el.value==='N/A'&&el.checked)inputs.forEach(i=>{if(i!==el)i.checked=false});else if(el.checked&&na)na.checked=false;const other=inputs.find(i=>i.value==='Other'),wrap=$('needToFindOtherWrap');if(wrap)wrap.style.display=other&&other.checked?'block':'none';if(!inputs.some(i=>i.checked)&&na)na.checked=true}
 function initNeedToFindOptions(){const inputs=[...document.querySelectorAll('input[name="needToFind"]')],na=inputs.find(i=>i.value==='N/A');if(!inputs.some(i=>i.checked)&&na)na.checked=true;const other=inputs.find(i=>i.value==='Other'),wrap=$('needToFindOtherWrap');if(wrap)wrap.style.display=other&&other.checked?'block':'none'}
