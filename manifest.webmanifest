@@ -1,6 +1,6 @@
 {
-  "name": "Wardrobe Studio",
-  "short_name": "Wardrobe",
+  "name": "My Wardrobe",
+  "short_name": "My Wardrobe",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#f5f3ef",
