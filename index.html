@@ -150,6 +150,14 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 .filter-dropdown[open]>summary{border-color:#b8aa98;background:#faf8f4}
 .filter-options{position:absolute;top:calc(100% + 6px);left:0;z-index:7;width:max-content;min-width:100%;max-width:min(88vw,330px);max-height:245px;overflow:auto;padding:7px;background:#fff;border:1px solid var(--line);border-radius:13px;box-shadow:0 9px 25px #30291f18}
 .filter-options label{display:flex;align-items:center;gap:9px;padding:9px 8px;border-radius:8px;font-size:12px;color:#39362f;white-space:nowrap}
+.need-find-field{margin-bottom:0}
+.need-find-dropdown{width:100%}
+.need-find-dropdown>summary{width:100%;font-weight:500}
+.need-find-options{width:100%;max-width:100%;max-height:210px}
+.need-find-options label{width:100%;white-space:nowrap;overflow:visible}
+.need-find-options input{flex:0 0 16px}
+.need-find-other{margin-top:8px}
+.need-find-other input{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:10px;background:#fff}
 .filter-options label:active{background:#f5f2ec}
 .filter-options input{width:16px;height:16px;margin:0;accent-color:#766653;flex:0 0 16px}
 .outfit-category-chips{margin:0;gap:7px;overflow:visible;flex-wrap:wrap}
@@ -266,8 +274,9 @@ function checks(name,opts,sel=[]){return '<div class="checks">'+opts.map(o=>'<la
 const needToFindOptions=['Trainers','Jeans','Tracksuit bottoms','Tracksuit','Jumper','Hoodie','T-shirt','Jacket','Hat','Other'];
 function needToFindItems(x){const selected=Array.isArray(x.needToFind)?x.needToFind:[],items=selected.filter(v=>v!=='N/A'&&v!=='Other');if(selected.includes('Other'))items.push(x.needToFindOther?'Other: '+x.needToFindOther:'Other');return [...items,...(x.missingItems||[])].filter(Boolean)}
 function needToFindCount(x){return needToFindItems(x).length}
-function toggleNeedToFindOption(el){const inputs=[...document.querySelectorAll('input[name="needToFind"]')],na=inputs.find(i=>i.value==='N/A');if(el.value==='N/A'&&el.checked)inputs.forEach(i=>{if(i!==el)i.checked=false});else if(el.checked&&na)na.checked=false;const other=inputs.find(i=>i.value==='Other'),wrap=$('needToFindOtherWrap');if(wrap)wrap.style.display=other&&other.checked?'block':'none';if(!inputs.some(i=>i.checked)&&na)na.checked=true}
-function initNeedToFindOptions(){const inputs=[...document.querySelectorAll('input[name="needToFind"]')],na=inputs.find(i=>i.value==='N/A');if(!inputs.some(i=>i.checked)&&na)na.checked=true;const other=inputs.find(i=>i.value==='Other'),wrap=$('needToFindOtherWrap');if(wrap)wrap.style.display=other&&other.checked?'block':'none'}
+function updateNeedToFindSummary(){const inputs=[...document.querySelectorAll('input[name="needToFind"]:checked')],selected=inputs.map(i=>i.value),summary=$('needToFindSummary');if(summary)summary.innerHTML=(selected.includes('N/A')||!selected.length?'N/A':selected.length+' selected')+' <span aria-hidden="true">⌄</span>'}
+function toggleNeedToFindOption(el){const inputs=[...document.querySelectorAll('input[name="needToFind"]')],na=inputs.find(i=>i.value==='N/A');if(el.value==='N/A'&&el.checked)inputs.forEach(i=>{if(i!==el)i.checked=false});else if(el.checked&&na)na.checked=false;if(!inputs.some(i=>i.checked)&&na)na.checked=true;const other=inputs.find(i=>i.value==='Other'),wrap=$('needToFindOtherWrap');if(wrap)wrap.style.display=other&&other.checked?'block':'none';updateNeedToFindSummary()}
+function initNeedToFindOptions(){const inputs=[...document.querySelectorAll('input[name="needToFind"]')],na=inputs.find(i=>i.value==='N/A');if(!inputs.some(i=>i.checked)&&na)na.checked=true;const other=inputs.find(i=>i.value==='Other'),wrap=$('needToFindOtherWrap');if(wrap)wrap.style.display=other&&other.checked?'block':'none';updateNeedToFindSummary()}
 function openForm(k,status='',id=''){
   kind=k;
   editing=records.find(x=>x.id===id)||null;
@@ -304,6 +313,7 @@ function openForm(k,status='',id=''){
       <input id="outfitItemSearch" placeholder="Search jeans, jumpers, colours…" oninput="filterOutfitPicker()">
       <select id="outfitItemType" style="margin-top:8px" onchange="filterOutfitPicker()"><option value="All">All types</option>${types.map(t=>'<option>'+esc(t)+'</option>').join('')}</select>
       <select id="outfitItemSort" style="margin-top:8px" aria-label="Sort clothing pieces" onchange="filterOutfitPicker()"><option value="newest">Newest added</option><option value="oldest">Oldest added</option><option value="az">Name A–Z</option></select>
+      <div class="field need-find-field" style="margin-top:12px"><label>Need to find</label><details class="filter-dropdown need-find-dropdown" id="needToFindDropdown"><summary id="needToFindSummary">N/A <span aria-hidden="true">⌄</span></summary><div class="filter-options need-find-options">${['N/A',...needToFindOptions].map(v=>'<label><input type="checkbox" name="needToFind" value="'+v+'" onchange="toggleNeedToFindOption(this)" '+(((x.needToFind||[]).includes(v)||(!needToFindItems(x).length&&v==='N/A'))?'checked':'')+'> '+v+'</label>').join('')}</div></details><div class="need-find-other" id="needToFindOtherWrap" style="display:${(x.needToFind||[]).includes('Other')?'block':'none'}"><input name="needToFindOther" placeholder="What else do you need to find?" value="${esc(x.needToFindOther||'')}"></div></div>
       <div class="sub" style="margin-top:9px">Colour (choose any)</div>
       <div id="outfitColourPicker" class="checks" style="margin-top:7px">${['Neutral',...colourOptions].map(c=>`<label><input type="checkbox" name="outfitColours" value="${c}" onchange="filterOutfitPicker()"> ${c}</label>`).join('')}</div>
       <div id="outfitItemPicker" class="outfit-pick-grid" style="margin-top:10px">${picker}</div>
@@ -313,7 +323,7 @@ function openForm(k,status='',id=''){
       <option ${((x.suitability||legacySuitability(x))==='Hat needed')?'selected':''}>Hat needed</option>
       <option ${((x.suitability||legacySuitability(x))==='Either')?'selected':''}>Either</option>
     </select></div>
-    <div class="field"><label>Need to find</label><div class="sub">Select anything you still need to find for this outfit.</div><div class="need-find-options">${['N/A',...needToFindOptions].map(v=>'<label><input type="checkbox" name="needToFind" value="'+v+'" onchange="toggleNeedToFindOption(this)" '+(((x.needToFind||[]).includes(v)||(!needToFindItems(x).length&&v==='N/A'))?'checked':'')+'> '+v+'</label>').join('')}</div><div class="need-find-other" id="needToFindOtherWrap" style="display:${(x.needToFind||[]).includes('Other')?'block':'none'}"><input name="needToFindOther" placeholder="What else do you need to find?" value="${esc(x.needToFindOther||'')}"></div></div>`;
+;
   }
   h+=`<div class="field"><label>Notes (fit, styling, etc.)</label><textarea name="notes" placeholder="Fit, styling details…">${esc(x.notes||'')}</textarea></div>`;
   $('fields').innerHTML=h;
