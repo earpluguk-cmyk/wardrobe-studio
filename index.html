@@ -546,7 +546,8 @@ function normaliseShortcutProduct(payload){
  const addCandidate=v=>{if(v&&typeof v==='object'&&!Array.isArray(v))candidates.push(v)};
  const addTree=v=>{v=parseMaybe(v);if(Array.isArray(v))v.forEach(addTree);else if(v&&typeof v==='object'){addCandidate(v);if(Array.isArray(v['@graph']))v['@graph'].forEach(addTree)}};
  addTree(product);addTree(root['@graph']);if(root.jsonLd)addTree(root.jsonLd);
- let htmlDoc=null;const pageData=root.pageData||root.matches||root.extracted||'';const htmlSource=text(root.html||root.pageHtml||(Array.isArray(pageData)?pageData.join('\\n'):pageData));
+ let htmlDoc=null;const pageData=root.pageData||root.matches||root.extracted||'';let htmlSource=text(root.html||root.pageHtml||(Array.isArray(pageData)?pageData.join('\\n'):pageData));
+ if(htmlSource){const embedded=parseMaybe(htmlSource);if(embedded!==htmlSource){addTree(embedded);if(embedded&&typeof embedded==='object')product=embedded}}
  if(htmlSource&&typeof DOMParser!=='undefined'){htmlDoc=new DOMParser().parseFromString(htmlSource,'text/html');htmlDoc.querySelectorAll('script[type="application/ld+json"]').forEach(s=>addTree(s.textContent))}
  const schemaProduct=candidates.find(o=>asArray(o['@type']).some(t=>String(t).toLowerCase()==='product'))||candidates[0]||{};
  const offerRaw=schemaProduct.offers||product.offers||root.offers,offer=parseMaybe(asArray(offerRaw)[0]||{});
