@@ -261,7 +261,7 @@ function go(p,resetToTop=false,fromHistory=false){if(!fromHistory){const current
  });
 })();
 function empty(t,d){return '<div class="empty"><b>'+t+'</b>'+d+'</div>'}
-function legacySuitability(x){let fresh=(x.hairTags||[]).includes('Fresh trim'),hat=(x.headTags||[]).includes('Hat'),grown=(x.hairTags||[]).includes('No fresh trim');if(fresh&&hat)return 'Either';if(hat||grown)return 'Hat needed';return 'Fresh trim'}
+function legacySuitability(x){let fresh=hasFilterMatch(x.hairTags||[],['Fresh trim']),hat=hasFilterMatch(x.headTags||[],['Hat']),grown=hasFilterMatch(x.hairTags||[],['No fresh trim']);if(fresh&&hat)return 'Either';if(hat||grown)return 'Hat needed';return 'Fresh trim'}
 function outfitPlaceholder(){return '<div class="outfit-photo-placeholder"><span class="outfit-question-mark">?</span><span>PHOTO TO ADD</span></div>'}
 function itemStatusPresentation(status){if(status==='Need to buy')return {className:'need-to-buy',badge:'NEEDS TO BUY'};if(status==='Ordered')return {className:'ordered-buy',badge:'ORDERED'};return {className:'',badge:''}}
 function statusBadge(status){const p=itemStatusPresentation(status);return p.badge?'<span class="need-buy-badge '+(status==='Ordered'?'ordered-badge':'')+'">'+p.badge+'</span>':''}
@@ -477,7 +477,7 @@ async function chooseTripOutfit(tripId,day,slot,outfitId){
 }
 function renderTrips(){
  const trips=records.filter(x=>x.kind==='trip');
- const holidayOutfits=records.filter(x=>x.kind==='outfit'&&((x.categories||(x.category?[x.category]:[])).includes('Holiday')||outfitSeasons(x).includes('Holiday')));
+ const holidayOutfits=records.filter(x=>x.kind==='outfit'&&(hasFilterMatch(x.categories||(x.category?[x.category]:[]),['Holiday'])||hasFilterMatch(outfitSeasons(x),['Holiday'])));
  const slots=['Day outfit','Evening outfit','Beach outfit','Swimming outfit','Sleepwear'];
  $('tripList').innerHTML=trips.map(t=>{
   const total=t.days||0,plan=t.plan||{};
