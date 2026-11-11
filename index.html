@@ -556,7 +556,7 @@ function normaliseShortcutProduct(payload){
  const name=pick(schemaProduct.name,product.name,product.title,root.name,root.title,meta['og:title'],meta['twitter:title'],metaGet('og:title'),metaGet('twitter:title'));
  const type=pick(schemaProduct.category,schemaProduct.productType,schemaProduct.type,product.type,product.product_type,root.type,meta['product:category']);
  const colour=pick(schemaProduct.color,schemaProduct.colour,product.colour,product.color,root.colour,root.color);
- const imageRaw=pick(schemaProduct.image,product.image,product.images,root.photo,root.image,root.image_url,meta['og:image'],meta['twitter:image'],metaGet('og:image'),metaGet('twitter:image'));
+ const imageRaw=pick(schemaProduct.image,product.image,product.featured_image,product.images,root.photo,root.image,root.image_url,meta['og:image'],meta['twitter:image'],metaGet('og:image'),metaGet('twitter:image'));
  let photo=Array.isArray(imageRaw)?imageRaw[0]:imageRaw;if(photo&&typeof photo==='object')photo=pick(photo.url,photo.contentUrl,photo.src);photo=text(photo);if(photo.startsWith('//'))photo='https:'+photo;
  let price=text(pick(offer.price,offer.lowPrice,schemaProduct.price,product.price,root.price,root.formatted_price,meta['product:price:amount'],metaGet('product:price:amount'))).trim();
  const currency=pick(offer.priceCurrency,schemaProduct.priceCurrency,product.priceCurrency,root.priceCurrency,meta['product:price:currency'],metaGet('product:price:currency'));
