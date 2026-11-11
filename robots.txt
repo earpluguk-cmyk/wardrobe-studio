@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /wardrobe-studio/
+
+Sitemap: https://earpluguk-cmyk.github.io/wardrobe-studio/sitemap.xml
