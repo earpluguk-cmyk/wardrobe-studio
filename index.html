@@ -294,7 +294,7 @@ function tile(x,showBuyNow=false){
 function render(){let it=records.filter(x=>x.kind==='item'&&!x.archived),os=records.filter(x=>x.kind==='outfit');$('nItems').textContent=it.length;$('nOutfits').textContent=os.filter(x=>x.status==='Ready').length;$('nWish').textContent=it.filter(x=>x.status!=='Owned').length+os.filter(x=>x.status!=='Ready').length+os.reduce((n,o)=>n+needToFindCount(o),0);$('recent').innerHTML=it.slice(-4).reverse().map(tile).join('')||empty('Your wardrobe starts here','Add a photo of your first piece.');$('homeLooks').innerHTML=os.filter(x=>x.status==='Ready').slice(-4).reverse().map(tile).join('')||empty('No ready outfits yet','Move an outfit to Ready when it is complete.');renderItems();renderOutfits();renderHolidayOutfits();renderTrips();renderWish()}
 function itemColours(x){return Array.isArray(x.colours)?x.colours:(x.colour?[x.colour]:[])}
 function itemSeasons(x){return Array.isArray(x.seasons)?x.seasons:(x.season?[x.season]:[])}
-function filterKey(value){return String(value??'').normalize('NFKC').trim().toLocaleLowerCase('en-GB').replace(/[\\s_-]+/g,' ')}
+function filterKey(value){return String(value??'').normalize('NFKC').trim().toLocaleLowerCase('en-GB').replace(/[\s_-]+/g,' ')}
 function itemTypeKey(value){const key=filterKey(value);const aliases={trainer:'trainers',trainers:'trainers',sneaker:'trainers',sneakers:'trainers','running shoe':'trainers','running shoes':'trainers'};return aliases[key]||key}
 function filterValueMatches(value,filter){return filterKey(value)===filterKey(filter)}
 function hasFilterMatch(values,filters){return !filters.length||filters.some(filter=>values.some(value=>filterValueMatches(value,filter)))}
