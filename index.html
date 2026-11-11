@@ -339,7 +339,7 @@ function renderWish(){
  let items=records.filter(x=>x.kind==='item'&&!x.archived&&x.status!=='Owned').sort((a,b)=>(b.updated||b.created||0)-(a.updated||a.created||0));
  let missing=records.filter(x=>x.kind==='outfit').flatMap(o=>needToFindItems(o).map(name=>'<button type="button" class="tile need-to-find" style="text-align:left;padding:0" data-id="'+o.id+'" onclick="details(this.dataset.id)"><span class="tile-photo-wrap"><span class="placeholder" style="aspect-ratio:4/5"><strong style="font:42px Georgia,serif">?</strong></span><span class="need-to-find-badge">NEED TO FIND</span></span><span class="tilebody" style="display:block"><span class="tiletitle">'+esc(name)+'</span><span class="sub">Needed for '+esc(o.name)+'</span></span></button>'));
  $('wishOutfitGrid').innerHTML=outfits.map(tile).join('')||empty('No outfits to finish','Outfit ideas and looks still in progress will appear here.');
- $('wishGrid').innerHTML=items.map(tile).join('')||empty('No clothing to buy','Save pieces you want to add to your wardrobe here.');
+ $('wishGrid').innerHTML=items.map(x=>tile(x,true)).join('')||empty('No clothing to buy','Save pieces you want to add to your wardrobe here.');
  $('wishMissingGrid').innerHTML=missing.join('')||empty('No pieces to find yet','Items you name for an outfit will appear here until you add them as clothing.');
 }
 function checks(name,opts,sel=[]){return '<div class="checks">'+opts.map(o=>'<label><input type="checkbox" name="'+name+'" value="'+o+'" '+(sel.includes(o)?'checked':'')+'> '+o+'</label>').join('')+'</div>'}
