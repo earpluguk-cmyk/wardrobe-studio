@@ -314,7 +314,7 @@ function openImport(){$('importPayload').value='';$('importPhoto').value='';$('i
 function closeImport(){$('importModal').classList.remove('show')}
 function applyImport(){
  let data;
- try{data=JSON.parse($('importPayload').value)}catch(e){$('importError').textContent='That data could not be read. Paste the complete JSON provided by ChatGPT.';$('importError').style.display='block';return}
+ try{let raw=$('importPayload').value.trim().replace(/^```(?:json)?\\s*/i,'').replace(/\\s*```$/,'');data=JSON.parse(raw)}catch(e){$('importError').textContent='That data could not be read. Paste the complete JSON provided by ChatGPT.';$('importError').style.display='block';return}
  if(!data||typeof data!=='object'||Array.isArray(data)||!String(data.name||'').trim()){$('importError').textContent='The item data needs a product name.';$('importError').style.display='block';return}
  const allowed=['Spring','Summer','Autumn','Winter','Holiday','All year'];
  const item={name:String(data.name).trim(),type:String(data.type||''),colours:(Array.isArray(data.colours)?data.colours: data.colour?[data.colour]:[]).filter(v=>colourOptions.includes(v)),status:statuses.includes(data.status)?data.status:'Owned',contexts:(Array.isArray(data.contexts)?data.contexts:[]).filter(v=>contexts.includes(v)),seasons:(Array.isArray(data.seasons)?data.seasons:[]).filter(v=>allowed.includes(v)),suitability:['Fresh trim','Hat needed','Either'].includes(data.suitability)?data.suitability:'Either',notes:String(data.notes||'')};
