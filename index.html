@@ -238,9 +238,57 @@ function closeProductImporter(){$('productImportModal').classList.remove('show')
 async function pasteProductUrl(){try{$('productUrlInput').value=(await navigator.clipboard.readText()).trim();$('productImportStatus').textContent='Link pasted. Tap Find product.'}catch(e){$('productImportStatus').textContent='Tap the link field and choose Paste.';$('productUrlInput').focus()}}
 function importPrice(p){if(p.price===null||p.price===undefined||String(p.price).trim()==='')return '';const raw=String(p.price).trim();if(/[£$€]/.test(raw))return raw;const currency=String(p.currency||'').toUpperCase();const symbol={GBP:'£',USD:'$',EUR:'€',CAD:'CA$',AUD:'A$',NZD:'NZ$'}[currency];return symbol?symbol+raw:(currency?currency+' '+raw:raw)}
 function importedType(p){const t=[p.name,p.description,p.type,p.category].filter(Boolean).join(' ').toLowerCase();const rules=[[/\b(polo|polo shirt)\b/,'Polo shirt'],[/\b(cardigan|jumper|sweater|knitwear|knit|pullover)\b/,'Jumper'],[/\b(hoodie|hooded sweatshirt)\b/,'Hoodie'],[/\b(tracksuit top|track top|track jacket)\b/,'Tracksuit jumper'],[/\b(vest|tank top|t-shirt|tee shirt|tee)\b/,'T-shirt'],[/\b(jeans|denim jeans)\b/,'Jeans'],[/\b(trousers|chinos|pants)\b/,'Trousers'],[/\b(shorts)\b/,'Shorts'],[/\b(blazer|coat|jacket|overshirt)\b/,'Jacket'],[/\b(trainers|sneakers|shoes)\b/,'Trainers'],[/\b(cap|beanie|hat)\b/,'Hat'],[/\b(scarf)\b/,'Scarf'],[/\b(sliders|flip flops)\b/,'Sliders'],[/\b(swimwear|swimming trunks|swim shorts)\b/,'Swimwear'],[/\b(pyjamas|pajamas)\b/,'Pyjamas']];for(const [re,type] of rules)if(re.test(t))return type;return ''}
-function importedColour(p){if(p.colour)return p.colour;const t=[p.name,p.description].filter(Boolean).join(' ').toLowerCase();const rules=[[/\b(charcoal|slate|silver|grey|gray)\b/,'Grey'],[/\b(cream|ivory|ecru)\b/,'Cream'],[/\b(beige|stone|oatmeal|taupe)\b/,'Beige'],[/\b(tan|camel)\b/,'Tan'],[/\b(brown|chocolate|mocha)\b/,'Brown'],[/\b(black)\b/,'Black'],[/\b(white)\b/,'White'],[/\b(navy|blue)\b/,'Blue'],[/\b(green|olive|khaki)\b/,'Green'],[/\b(red|burgundy|wine)\b/,'Red'],[/\b(pink)\b/,'Pink'],[/\b(purple)\b/,'Purple'],[/\b(yellow)\b/,'Yellow'],[/\b(orange)\b/,'Orange']];for(const [re,c] of rules)if(re.test(t))return c;return ''}
-async function findProduct(){const url=$('productUrlInput').value.trim(),button=$('findProductButton');if(!url){$('productImportStatus').textContent='Paste a product link first.';return}try{const parsed=new URL(url);if(!['http:','https:'].includes(parsed.protocol))throw Error('Invalid URL')}catch(e){$('productImportStatus').textContent='Enter a valid product page link.';return}button.disabled=true;button.textContent='Finding…';$('productImportStatus').textContent='Looking for product details…';$('productImportPreview').className='product-import-preview';$('productImportPreview').innerHTML='';try{const response=await fetch(PRODUCT_IMPORTER_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({url})});const data=await response.json();if(!response.ok||!data.success)throw Error(data.error||'We couldn’t read that product page.');importedProduct=data.product;const p=importedProduct,price=importPrice(p),suggestedType=importedType(p),suggestedColour=importedColour(p);$('productImportPreview').innerHTML=(p.image?'<img src="'+esc(p.image)+'" alt="Product image">':'')+'<h3>'+esc(p.name||'Product details found')+'</h3>'+'<p class="settings-note">'+esc([p.brand,p.colour,p.retailer].filter(Boolean).join(' · '))+'</p>'+(price?'<p><strong>'+esc(price)+'</strong></p>':'')+((suggestedType||suggestedColour)?'<p class="settings-note">Suggested: '+esc([suggestedType,suggestedColour].filter(Boolean).join(' · '))+'</p>':'')+(p.description?'<p class="settings-note">'+esc(p.description.slice(0,220))+'</p>':'')+'<div class="product-import-actions"><button type="button" class="secondary" onclick="useImportedProduct(&quot;Need to buy&quot;)">Add to wishlist</button><button type="button" class="primary" onclick="useImportedProduct(&quot;Owned&quot;)">Add to wardrobe</button></div>';$('productImportPreview').className='product-import-preview show';$('productImportStatus').textContent='Check the details, then choose where to save it.'}catch(e){$('productImportStatus').textContent=e.message||'Product import failed. Try another retailer link.'}finally{button.disabled=false;button.textContent='Find product'}}
-function useImportedProduct(status){if(!importedProduct)return;const p=importedProduct;closeProductImporter();openForm('item',status);const name=$('editor').querySelector('[name="name"]'),price=$('editor').querySelector('[name="price"]'),source=$('editor').querySelector('[name="sourceUrl"]');if(name)name.value=p.name||'';if(price)price.value=importPrice(p);if(source)source.value=p.sourceUrl||'';const typeField=$('editor').querySelector('[name="type"]'),suggestedType=importedType(p);if(typeField&&suggestedType)typeField.value=suggestedType;const suggestedColour=importedColour(p);if(p.image){newPhoto=p.image;$('preview').src=p.image;$('preview').style.display='block'}if(suggestedColour){const colour=suggestedColour.toLowerCase();document.querySelectorAll('#fields input[name="colours"]').forEach(el=>{if(colour===el.value.toLowerCase())el.checked=true})}}
+function importedColour(p){
+ const raw=String(p.colour||'').trim();
+ const text=raw||[p.name,p.description].filter(Boolean).join(' ');
+ const t=text.toLowerCase().replace(/[–—_/]+/g,' ');
+ if(/\b(multi[ -]?colou?red|multicolou?r|assorted colours?|colour block|color block)\b/.test(t))return 'Multicolour';
+ const colourRules=[
+  [/\b(charcoal|anthracite|slate|silver|ash|graphite|grey|gray)\b/,'Grey'],
+  [/\b(cream|ivory|ecru|off white|offwhite|bone)\b/,'Cream'],
+  [/\b(beige|stone|oatmeal|taupe|sand)\b/,'Beige'],
+  [/\b(tan|camel|cognac)\b/,'Tan'],
+  [/\b(brown|chocolate|mocha|espresso)\b/,'Brown'],
+  [/\b(black|jet black)\b/,'Black'],
+  [/\b(white|optic white)\b/,'White'],
+  [/\b(navy|blue|denim|cobalt|indigo)\b/,'Blue'],
+  [/\b(green|olive|khaki|sage|forest)\b/,'Green'],
+  [/\b(red|burgundy|wine|maroon|crimson)\b/,'Red'],
+  [/\b(pink|blush|rose)\b/,'Pink'],
+  [/\b(purple|lilac|violet)\b/,'Purple'],
+  [/\b(yellow|mustard)\b/,'Yellow'],
+  [/\b(orange|rust)\b/,'Orange']
+ ];
+ const found=[];
+ for(const [re,c] of colourRules)if(re.test(t)&&!found.includes(c))found.push(c);
+ if(found.length>1)return 'Multicolour';
+ return found[0]||'';
+}
+function importedSeasons(p){
+ const type=importedType(p);
+ const rules={
+  'Jumper':['Autumn','Winter'],
+  'Hoodie':['Autumn','Winter'],
+  'Tracksuit jumper':['Autumn','Winter'],
+  'Jacket':['Autumn','Winter'],
+  'Scarf':['Autumn','Winter'],
+  'T-shirt':['Spring','Summer'],
+  'Polo shirt':['Spring','Summer'],
+  'Shorts':['Summer'],
+  'Sliders':['Summer'],
+  'Swimwear':['Summer','Holiday'],
+  'Hat':['Summer','Winter'],
+  'Tracksuit bottoms':['Autumn','Winter'],
+  'Jeans':['All year'],
+  'Trousers':['All year'],
+  'Trainers':['All year'],
+  'Watch':['All year'],
+  'Pyjamas':['All year']
+ };
+ return rules[type]||[];
+}
+async function findProduct(){const url=$('productUrlInput').value.trim(),button=$('findProductButton');if(!url){$('productImportStatus').textContent='Paste a product link first.';return}try{const parsed=new URL(url);if(!['http:','https:'].includes(parsed.protocol))throw Error('Invalid URL')}catch(e){$('productImportStatus').textContent='Enter a valid product page link.';return}button.disabled=true;button.textContent='Finding…';$('productImportStatus').textContent='Looking for product details…';$('productImportPreview').className='product-import-preview';$('productImportPreview').innerHTML='';try{const response=await fetch(PRODUCT_IMPORTER_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({url})});const data=await response.json();if(!response.ok||!data.success)throw Error(data.error||'We couldn’t read that product page.');importedProduct=data.product;const p=importedProduct,price=importPrice(p),suggestedType=importedType(p),suggestedColour=importedColour(p);$('productImportPreview').innerHTML=(p.image?'<img src="'+esc(p.image)+'" alt="Product image">':'')+'<h3>'+esc(p.name||'Product details found')+'</h3>'+'<p class="settings-note">'+esc([p.brand,p.colour,p.retailer].filter(Boolean).join(' · '))+'</p>'+(price?'<p><strong>'+esc(price)+'</strong></p>':'')+((suggestedType||suggestedColour||importedSeasons(p).length)?'<p class="settings-note">Suggested: '+esc([suggestedType,suggestedColour,...(importedSeasons(p).length?[importedSeasons(p).join(' / ')]:[])].filter(Boolean).join(' · '))+'</p>':'')+(p.description?'<p class="settings-note">'+esc(p.description.slice(0,220))+'</p>':'')+'<div class="product-import-actions"><button type="button" class="secondary" onclick="useImportedProduct(&quot;Need to buy&quot;)">Add to wishlist</button><button type="button" class="primary" onclick="useImportedProduct(&quot;Owned&quot;)">Add to wardrobe</button></div>';$('productImportPreview').className='product-import-preview show';$('productImportStatus').textContent='Check the details, then choose where to save it.'}catch(e){$('productImportStatus').textContent=e.message||'Product import failed. Try another retailer link.'}finally{button.disabled=false;button.textContent='Find product'}}
+function useImportedProduct(status){if(!importedProduct)return;const p=importedProduct;closeProductImporter();openForm('item',status);const name=$('editor').querySelector('[name="name"]'),price=$('editor').querySelector('[name="price"]'),source=$('editor').querySelector('[name="sourceUrl"]');if(name)name.value=p.name||'';if(price)price.value=importPrice(p);if(source)source.value=p.sourceUrl||'';const typeField=$('editor').querySelector('[name="type"]'),suggestedType=importedType(p);if(typeField&&suggestedType)typeField.value=suggestedType;const suggestedColour=importedColour(p);if(p.image){newPhoto=p.image;$('preview').src=p.image;$('preview').style.display='block'}if(suggestedColour){const colour=suggestedColour.toLowerCase();document.querySelectorAll('#fields input[name="colours"]').forEach(el=>{if(colour===el.value.toLowerCase())el.checked=true})}const suggestedSeasons=importedSeasons(p);if(suggestedSeasons.length){const seasonSet=new Set(suggestedSeasons.map(v=>v.toLowerCase()));document.querySelectorAll('#fields input[name="seasons"]').forEach(el=>{if(seasonSet.has(el.value.toLowerCase()))el.checked=true})}}
 function openDB(){return new Promise((res,rej)=>{let q=indexedDB.open(DB,1);q.onupgradeneeded=()=>q.result.createObjectStore(STORE,{keyPath:'id'});q.onsuccess=()=>{db=q.result;res()};q.onerror=()=>rej(q.error)})}
 function all(){return new Promise((res,rej)=>{let q=db.transaction(STORE).objectStore(STORE).getAll();q.onsuccess=()=>res(q.result);q.onerror=()=>rej(q.error)})}
 function put(x){return new Promise((res,rej)=>{let q=db.transaction(STORE,'readwrite').objectStore(STORE).put(x);q.onsuccess=res;q.onerror=()=>rej(q.error)})}
