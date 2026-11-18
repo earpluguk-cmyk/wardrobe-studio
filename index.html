@@ -333,16 +333,16 @@ function formatItemPrice(value){
   const amount=(numeric>999&&!/[£$€]/.test(raw)?numeric/100:numeric).toFixed(2);
   return /[£$€]/.test(raw)?raw.replace(/[0-9,]+(?:\\.[0-9]+)?/,amount):'£'+amount;
 }
-function tile(x,showBuyNow=false){
+function tile(x,showBuyNow=false,showWishlistStatus=false){
   const isOutfit=x.kind==='outfit';
   const categories=isOutfit?(x.categories||(x.category?[x.category]:[])):(x.contexts||[]);
   const seasons=isOutfit?outfitSeasons(x):[];
   const tags=isOutfit?[x.status,x.suitability||legacySuitability(x),...categories,...seasons]:[...(x.archived?['Archived']:[]),...categories,...itemSeasons(x),x.suitability||legacySuitability(x)];
-  const subtitle=isOutfit?[x.status,categories.join(' · '),seasons.join(' · ')].filter(Boolean).join(' · '):([itemTypeLabel(x.type),x.status].filter(Boolean).join(' · '));
+  const subtitle=isOutfit?[...(showWishlistStatus?[x.status]:[]),categories.join(' · '),seasons.join(' · ')].filter(Boolean).join(' · '):([itemTypeLabel(x.type),x.status].filter(Boolean).join(' · '));
   const statusPresentation=!isOutfit?itemStatusPresentation(x.status):{className:'',badge:''};
   const hasNeedToFind=isOutfit&&needToFindCount(x)>0;
   const photoContent=x.photo?'<img class="photo" src="'+x.photo+'" alt="'+esc(x.name)+'">':(isOutfit?outfitPlaceholder():'<div class="placeholder"><strong style="font:42px Georgia,serif">?</strong></div>');
-  const photo='<div class="tile-photo-wrap">'+photoContent+(isOutfit?outfitOutstandingBadges(x):statusBadge(x.status))+'</div>';
+  const photo='<div class="tile-photo-wrap">'+photoContent+(isOutfit?(showWishlistStatus?outfitOutstandingBadges(x):''):statusBadge(x.status))+'</div>';
   const pills=tags.slice(0,5).map(tag=>'<span class="pill">'+esc(tag)+'</span>').join('');
   const click=' onclick="details(&quot;'+x.id+'&quot;)" role="button" tabindex="0"';
   const outfitClasses=isOutfit?((x.itemIds||[]).map(id=>records.find(i=>i.kind==='item'&&i.id===id)).filter(Boolean).some(i=>i.status==='Need to buy')?' need-to-buy':'')+((x.itemIds||[]).map(id=>records.find(i=>i.kind==='item'&&i.id===id)).filter(Boolean).some(i=>i.status==='Ordered')?' ordered-buy':'')+(hasNeedToFind?' need-to-find':''):'';
@@ -404,7 +404,7 @@ function renderWish(){
  const outfitStatusOrder={'In Progress':0,'In progress':0,'Need to Try On':1,'Ready':2};let outfits=records.filter(x=>x.kind==='outfit'&&x.status!=='Ready').sort((a,b)=>(outfitStatusOrder[a.status]??0)-(outfitStatusOrder[b.status]??0)||(b.updated||b.created||0)-(a.updated||a.created||0));
  let items=records.filter(x=>x.kind==='item'&&!x.archived&&x.status!=='Owned').sort((a,b)=>(b.updated||b.created||0)-(a.updated||a.created||0));
  let missing=records.filter(x=>x.kind==='outfit').flatMap(o=>needToFindItems(o).map(name=>'<button type="button" class="tile need-to-find" style="text-align:left;padding:0" data-id="'+o.id+'" onclick="details(this.dataset.id)"><span class="tile-photo-wrap"><span class="placeholder" style="aspect-ratio:4/5"><strong style="font:42px Georgia,serif">?</strong></span><span class="need-to-find-badge">NEED TO FIND</span></span><span class="tilebody" style="display:block"><span class="tiletitle">'+esc(name)+'</span><span class="sub">Needed for '+esc(o.name)+'</span></span></button>'));
- $('wishOutfitGrid').innerHTML=outfits.map(tile).join('')||empty('No outfits to finish','Outfit ideas and looks still in progress will appear here.');
+ $('wishOutfitGrid').innerHTML=outfits.map(o=>tile(o,false,true)).join('')||empty('No outfits to finish','Outfit ideas and looks still in progress will appear here.');
  $('wishGrid').innerHTML=items.map(x=>tile(x,true)).join('')||empty('No clothing to buy','Save pieces you want to add to your wardrobe here.');
  $('wishMissingGrid').innerHTML=missing.join('')||empty('No pieces to find yet','Items you name for an outfit will appear here until you add them as clothing.');
 }
