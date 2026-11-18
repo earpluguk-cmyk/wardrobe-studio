@@ -337,7 +337,7 @@ function tile(x,showBuyNow=false,showWishlistStatus=false){
   const isOutfit=x.kind==='outfit';
   const categories=isOutfit?(x.categories||(x.category?[x.category]:[])):(x.contexts||[]);
   const seasons=isOutfit?outfitSeasons(x):[];
-  const tags=isOutfit?[x.status,x.suitability||legacySuitability(x),...categories,...seasons]:[...(x.archived?['Archived']:[]),...categories,...itemSeasons(x),x.suitability||legacySuitability(x)];
+  const tags=isOutfit?[x.suitability||legacySuitability(x),...categories,...seasons]:[...(x.archived?['Archived']:[]),...categories,...itemSeasons(x),x.suitability||legacySuitability(x)];
   const subtitle=isOutfit?[...(showWishlistStatus?[x.status]:[]),categories.join(' · '),seasons.join(' · ')].filter(Boolean).join(' · '):([itemTypeLabel(x.type),x.status].filter(Boolean).join(' · '));
   const statusPresentation=!isOutfit?itemStatusPresentation(x.status):{className:'',badge:''};
   const hasNeedToFind=isOutfit&&needToFindCount(x)>0;
