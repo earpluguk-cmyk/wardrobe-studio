@@ -357,7 +357,7 @@ function tile(x,showBuyNow=false,showWishlistStatus=false){
 }
 function render(){let it=records.filter(x=>x.kind==='item'&&!x.archived),os=records.filter(x=>x.kind==='outfit');$('nItems').textContent=it.length;$('nOutfits').textContent=os.filter(x=>x.status==='Ready').length;$('nWish').textContent=it.filter(x=>x.status!=='Owned').length+os.filter(x=>x.status!=='Ready').length+os.filter(o=>o.status!=='Ready').reduce((n,o)=>n+needToFindCount(o),0);$('recent').innerHTML=it.slice(-4).reverse().map(tile).join('')||empty('Your wardrobe starts here','Add a photo of your first piece.');$('homeLooks').innerHTML=os.filter(x=>x.status==='Ready').slice(-4).reverse().map(tile).join('')||empty('No ready outfits yet','Move an outfit to Ready when it is complete.');renderItems();renderOutfits();renderHolidayOutfits();renderTrips();renderWish()}
 
-const WARDROBE_APP_VERSION=107;
+const WARDROBE_APP_VERSION=108;
 async function checkWardrobeVersion(){
  const badge=document.getElementById('wardrobeVersionBadge'),msg=document.getElementById('wardrobeVersionMessage'),refresh=document.getElementById('wardrobeRefreshButton');
  if(!badge)return;badge.textContent='Checking…';msg.textContent='Checking the published website…';refresh.hidden=true;
@@ -635,5 +635,30 @@ function snoozeBackupReminder(){localStorage.setItem('wardrobe-backup-reminder-s
 function openBackupSave(){$('backupReminderModal').classList.remove('show');go('backupSettings',true);setTimeout(()=>{const b=$('downloadBackupButton');b.focus({preventScroll:true})},80)}
 async function storageInfo(){const photoBytes=records.reduce((a,x)=>a+(x.photo?.length||0)*.75,0);$('storageInfo').textContent='Approx. '+(photoBytes/1048576).toFixed(1)+' MB of photos in your wardrobe.';updateBackupStatus();if(!navigator.storage?.estimate){$('storageDetails').textContent='Your browser does not provide a storage quota estimate. The photo figure above is an estimate only.';return}try{const estimate=await navigator.storage.estimate(),used=estimate.usage,quota=estimate.quota;if(typeof used!=='number'||typeof quota!=='number'||quota<=0){$('storageDetails').textContent='Your browser did not provide a usable storage estimate. The photo figure above is an estimate only.';return}const pct=Math.min(100,used/quota*100);$('storageMeterFill').style.width=pct.toFixed(1)+'%';$('storageDetails').textContent='This website is using about '+(used/1048576).toFixed(1)+' MB of an estimated '+(quota/1048576).toFixed(0)+' MB available ('+pct.toFixed(1)+'%). This includes browser data for this website, not just wardrobe photos. The browser may change the available limit.'}catch(e){$('storageDetails').textContent='Could not read the browser storage estimate. The photo figure above is an estimate only.'}}
 
-(async()=>{await openDB();records=await all();render();smartLoadWeather();renderTrips();storageInfo();showBackupReminderIfDue();let remembered='home';try{const saved=sessionStorage.getItem('wardrobe-active-section');if(['home','clothing','outfits','wishlist','holiday'].includes(saved))remembered=saved}catch(e){}go(remembered,true);if('serviceWorker'in navigator)navigator.serviceWorker.register('./sw.js',{updateViaCache:'none'}).then(reg=>reg.update()).catch(()=>{})})().catch(()=>alert('Could not open local storage. Please use Safari.'));
+(async()=>{
+ // Open the existing browser database without deleting or replacing any records.
+ try{
+  await openDB();
+  records=await all();
+ }catch(error){
+  console.error('Wardrobe database could not be opened:',error);
+  alert('Could not access this browser\'s wardrobe storage. Your data has not been cleared. Please reopen the app. Do not delete website data or restore a backup until the issue is checked.');
+  return;
+ }
+ // Keep startup limited to features that are still present. Weather suggestions were removed.
+ render();
+ renderTrips();
+ storageInfo();
+ showBackupReminderIfDue();
+ let remembered='home';
+ try{
+  const saved=sessionStorage.getItem('wardrobe-active-section');
+  if(['home','clothing','outfits','wishlist','holiday'].includes(saved))remembered=saved;
+ }catch(e){}
+ go(remembered,true);
+ if('serviceWorker'in navigator)navigator.serviceWorker.register('./sw.js',{updateViaCache:'none'}).then(reg=>reg.update()).catch(()=>{});
+})().catch(error=>{
+ console.error('Wardrobe startup failed:',error);
+ alert('Your wardrobe could not finish loading. Please reopen the app. Do not clear your browser data.');
+});
 </script></body></html>
