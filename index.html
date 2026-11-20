@@ -299,7 +299,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
       <div class="weather-stat"><div class="weather-stat-label weather-stat-label-with-icon" id="weatherRainHeading"><span class="weather-stat-icon" id="weatherPrecipIcon" aria-hidden="true"></span><span id="weatherPrecipLabel">Rain expected</span></div><div class="weather-stat-value" id="weatherRain">—</div></div>
       <div class="weather-stat"><div class="weather-stat-label weather-stat-label-with-icon"><span class="weather-stat-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"><path d="M14 14.8V5a3 3 0 0 0-6 0v9.8a5 5 0 1 0 6 0Z"/><path d="M11 11v8"/></svg></span><span>Feels like</span></div><div class="weather-stat-value" id="weatherFeelsTile">—</div></div>
     </div>
-    <div class="weather-meta"><span id="weatherUpdated"></span></div>
+    <div class="weather-meta" hidden style="display:none"><span id="weatherUpdated"></span></div>
   </div>
   <div class="weather-location-options" id="weatherLocationOptions" hidden>
      <p>If phone location is unavailable, weather may use your approximate area. Choose a town here if you want to change it.</p>
@@ -458,7 +458,7 @@ function tile(x,showBuyNow=false,showWishlistStatus=false){
 }
 function render(){let it=records.filter(x=>x.kind==='item'&&!x.archived),os=records.filter(x=>x.kind==='outfit');$('nItems').textContent=it.length;$('nOutfits').textContent=os.filter(x=>x.status==='Ready').length;$('nWish').textContent=it.filter(x=>x.status!=='Owned').length+os.filter(x=>x.status!=='Ready').length+os.filter(o=>o.status!=='Ready').reduce((n,o)=>n+needToFindCount(o),0);$('recent').innerHTML=it.slice(-4).reverse().map(tile).join('')||empty('Your wardrobe starts here','Add a photo of your first piece.');$('homeLooks').innerHTML=os.filter(x=>x.status==='Ready').slice(-4).reverse().map(tile).join('')||empty('No ready outfits yet','Move an outfit to Ready when it is complete.');renderItems();renderOutfits();renderHolidayOutfits();renderTrips();renderWish()}
 
-const WARDROBE_APP_VERSION=116;
+const WARDROBE_APP_VERSION=117;
 document.getElementById('wardrobeInstalledVersion').textContent='v'+WARDROBE_APP_VERSION;
 
 // Only code/runtime and connectivity information is logged. Never include wardrobe records or photos.
