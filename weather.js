@@ -50,13 +50,28 @@ function describeCode(code){
  if(code===1||code===2)return 'Partly cloudy';
  return 'Cloudy';
 }
+// SVG outlines keep the icons neutral on iPhone, where emoji often render in colour.
+const weatherSvgPaths={
+ sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"/>',
+ cloud:'<path d="M20 16.6A4.5 4.5 0 0 0 17.5 8a6 6 0 0 0-11.3 2A4 4 0 0 0 6 18h12a3 3 0 0 0 2-1.4Z"/>',
+ 'cloud-sun':'<path d="M12 3a3.5 3.5 0 0 0-3.4 4.4M4 6l-1-1M2 11h2m9-7 1-2M20 17a4 4 0 0 0-3.5-6 5 5 0 0 0-9.8 1A3.5 3.5 0 0 0 7 19h10a3.5 3.5 0 0 0 3-2Z"/>',
+ rain:'<path d="M20 15a4.5 4.5 0 0 0-3.5-7 6 6 0 0 0-11 2.8A4 4 0 0 0 6 18h10"/><path d="m9 20-1 2m5-3-1 2m5-2-1 2"/>',
+ snow:'<path d="M12 2v20M4 6l16 12M20 6 4 18m5-13 3 3 3-3m-6 14 3-3 3 3M3 11l3 1-1 3m16-4-3 1 1 3"/>',
+ storm:'<path d="M19 14a5 5 0 0 0-4-8 6 6 0 0 0-11 5 4 4 0 0 0 1 7h5"/><path d="m14 13-3 5h4l-3 4"/>',
+ umbrella:'<path d="M3 12a9 9 0 0 1 18 0H3Z"/><path d="M12 12v7a2 2 0 0 0 4 0"/>',
+ thermometer:'<path d="M14 14.8V5a3 3 0 0 0-6 0v9.8a5 5 0 1 0 6 0Z"/><path d="M11 11v8"/>'
+};
+function weatherSvg(key){
+ const path=weatherSvgPaths[key]||weatherSvgPaths.cloud;
+ return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+path+'</svg>';
+}
 function weatherSymbol(code){
- if(code===0)return '☀︎';
- if(code===1||code===2)return '☀︎';
- if((code>=71&&code<=77||code===85||code===86))return '❄︎';
- if(code>=51&&code<=67||code>=80&&code<=82)return '☂︎';
- if(code>=95)return '⚡︎';
- return '☁︎';
+ if(code===0)return 'sun';
+ if(code===1||code===2)return 'cloud-sun';
+ if((code>=71&&code<=77||code===85||code===86))return 'snow';
+ if(code>=51&&code<=67||code>=80&&code<=82)return 'rain';
+ if(code>=95)return 'storm';
+ return 'cloud';
 }
 function rainHour(hour){
  return (Number(hour.rain)||0)>=0.25||(Number(hour.pop)||0)>=60||[51,53,55,56,57,61,63,65,66,67,80,81,82,95,96,99].includes(hour.code);
@@ -146,7 +161,7 @@ function renderBrief(result,label){
  node('weatherLocationLabel').textContent=label||'Your location';
  node('weatherTemp').textContent=result.temperature+'°C';
  node('weatherFeels').textContent=result.condition;
- node('weatherIcon').textContent=result.icon;
+ node('weatherIcon').innerHTML=weatherSvg(result.icon);
  node('weatherCondition').textContent=result.condition;
  const list=node('weatherObservations');
  list.replaceChildren();
@@ -159,7 +174,8 @@ function renderBrief(result,label){
  node('weatherWearTitle').textContent=result.title;
  node('weatherWearDetail').textContent=result.detail;
  node('weatherRain').textContent=result.rainLabel;
- node('weatherRainHeading').textContent=result.precipType;
+ node('weatherPrecipLabel').textContent=result.precipType;
+ node('weatherPrecipIcon').innerHTML=weatherSvg(result.precipType==='Snow possible'?'snow':'umbrella');
  node('weatherFeelsTile').textContent=result.feels+'°C';
  node('weatherUpdated').textContent='Updated '+new Date(result.updated).toLocaleTimeString('en-GB',{hour:'numeric',minute:'2-digit'});
  node('weatherReady').hidden=false;
