@@ -42,7 +42,7 @@ function hourRange(start,end){
 }
 function describeCode(code){
  if(code>=95)return 'Thunderstorms';
- if(code>=71&&code<=86)return 'Snowy';
+ if((code>=71&&code<=77||code===85||code===86))return 'Snowy';
  if(code>=51&&code<=67)return 'Rainy';
  if(code>=80&&code<=82)return 'Showery';
  if(code===45||code===48)return 'Foggy';
@@ -53,7 +53,7 @@ function describeCode(code){
 function weatherSymbol(code){
  if(code===0)return '☀︎';
  if(code===1||code===2)return '☀︎';
- if(code>=71&&code<=86)return '❄︎';
+ if((code>=71&&code<=77||code===85||code===86))return '❄︎';
  if(code>=51&&code<=67||code>=80&&code<=82)return '☂︎';
  if(code>=95)return '⚡︎';
  return '☁︎';
@@ -84,7 +84,7 @@ function weatherBrief(data){
  const firstRain=rainHours[0];
  let rainStart=null,rainEnd=null,rainLabel='No rain expected',rainLine='Dry for most of the day',anyRain=!!firstRain;
  const significant=rainHours.some(h=>h.rain>=1.5||h.pop>=80||[63,65,81,82,95,96,99].includes(h.code));
- const snow=forecast.some(h=>h.code>=71&&h.code<=86);
+ const snow=forecast.some(h=>(h.code>=71&&h.code<=77||h.code===85||h.code===86));
  if(anyRain){
    rainStart=firstRain.time;
    const idx=forecast.indexOf(firstRain);
