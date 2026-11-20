@@ -248,7 +248,11 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 .weather-error{color:#955c4f}
 .weather-spinner{display:inline-block;border:2px solid #ddd9d1;border-top-color:#70685d;width:13px;height:13px;border-radius:50%;animation:wardrobe-spin .75s linear infinite;vertical-align:middle;margin-left:5px}
 .weather-main{display:flex;align-items:center;gap:14px;margin:14px 0}
-.weather-condition-icon{width:51px;height:49px;display:flex;justify-content:center;align-items:center;font:44px/1 Georgia,serif;color:#948979}
+.weather-condition-icon{width:51px;height:49px;display:flex;justify-content:center;align-items:center;color:#948979}
+.weather-condition-icon svg{width:44px;height:44px;display:block}
+.weather-stat-label-with-icon{display:flex;align-items:center;gap:6px}
+.weather-stat-icon{display:inline-flex;width:14px;height:14px;flex:0 0 14px;color:#807569;align-items:center;justify-content:center}
+.weather-stat-icon svg{display:block;width:14px;height:14px}
 .weather-temp{font:40px/1.05 Georgia,serif;letter-spacing:-1px;color:#312e29}
 .weather-now{font-size:12px;color:#786f64;margin-top:3px}
 .weather-observations{list-style:none;margin:11px 0 14px;padding:0;display:grid;gap:8px}
@@ -285,15 +289,15 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
   <div class="weather-progress-line" id="weatherProgressLine"><span class="weather-spinner" id="weatherSpinner" aria-hidden="true"></span><span class="weather-status" id="weatherStatus" role="status" aria-live="polite">Finding your local forecast…</span></div>
   <div id="weatherEmpty" class="weather-empty">Use your phone's location or enter a town to see what to wear today.</div>
   <div id="weatherReady" hidden>
-    <div class="weather-main"><span id="weatherIcon" class="weather-condition-icon" aria-hidden="true">☁︎</span><div><div id="weatherTemp" class="weather-temp">—</div><div class="weather-now" id="weatherFeels">Weather near you</div><span id="weatherCondition" hidden></span></div></div>
+    <div class="weather-main"><span id="weatherIcon" class="weather-condition-icon" aria-hidden="true"></span><div><div id="weatherTemp" class="weather-temp">—</div><div class="weather-now" id="weatherFeels">Weather near you</div><span id="weatherCondition" hidden></span></div></div>
     <ul id="weatherObservations" class="weather-observations"></ul>
     <div class="weather-rule"></div>
     <div class="weather-advice-label">WHAT TO WEAR</div>
     <h3 class="weather-advice-title" id="weatherWearTitle">—</h3>
     <p class="weather-advice-detail" id="weatherWearDetail"></p>
     <div class="weather-stats">
-      <div class="weather-stat"><div class="weather-stat-label" id="weatherRainHeading">☂ &nbsp;Rain expected</div><div class="weather-stat-value" id="weatherRain">—</div></div>
-      <div class="weather-stat"><div class="weather-stat-label">◌ &nbsp;Feels like</div><div class="weather-stat-value" id="weatherFeelsTile">—</div></div>
+      <div class="weather-stat"><div class="weather-stat-label weather-stat-label-with-icon" id="weatherRainHeading"><span class="weather-stat-icon" id="weatherPrecipIcon" aria-hidden="true"></span><span id="weatherPrecipLabel">Rain expected</span></div><div class="weather-stat-value" id="weatherRain">—</div></div>
+      <div class="weather-stat"><div class="weather-stat-label weather-stat-label-with-icon"><span class="weather-stat-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"><path d="M14 14.8V5a3 3 0 0 0-6 0v9.8a5 5 0 1 0 6 0Z"/><path d="M11 11v8"/></svg></span><span>Feels like</span></div><div class="weather-stat-value" id="weatherFeelsTile">—</div></div>
     </div>
     <div class="weather-meta"><span id="weatherUpdated"></span><span>·</span><a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer">Weather by Open-Meteo</a><span>(<a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer">CC BY 4.0</a>)</span><span>·</span><span>General clothing guidance</span></div>
   </div>
@@ -454,7 +458,7 @@ function tile(x,showBuyNow=false,showWishlistStatus=false){
 }
 function render(){let it=records.filter(x=>x.kind==='item'&&!x.archived),os=records.filter(x=>x.kind==='outfit');$('nItems').textContent=it.length;$('nOutfits').textContent=os.filter(x=>x.status==='Ready').length;$('nWish').textContent=it.filter(x=>x.status!=='Owned').length+os.filter(x=>x.status!=='Ready').length+os.filter(o=>o.status!=='Ready').reduce((n,o)=>n+needToFindCount(o),0);$('recent').innerHTML=it.slice(-4).reverse().map(tile).join('')||empty('Your wardrobe starts here','Add a photo of your first piece.');$('homeLooks').innerHTML=os.filter(x=>x.status==='Ready').slice(-4).reverse().map(tile).join('')||empty('No ready outfits yet','Move an outfit to Ready when it is complete.');renderItems();renderOutfits();renderHolidayOutfits();renderTrips();renderWish()}
 
-const WARDROBE_APP_VERSION=112;
+const WARDROBE_APP_VERSION=113;
 document.getElementById('wardrobeInstalledVersion').textContent='v'+WARDROBE_APP_VERSION;
 
 // Only code/runtime and connectivity information is logged. Never include wardrobe records or photos.
