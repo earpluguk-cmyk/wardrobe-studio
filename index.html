@@ -287,7 +287,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
     </div>
   </div>
   <div class="weather-progress-line" id="weatherProgressLine"><span class="weather-spinner" id="weatherSpinner" aria-hidden="true"></span><span class="weather-status" id="weatherStatus" role="status" aria-live="polite">Finding your local forecast…</span></div>
-  <div id="weatherEmpty" class="weather-empty">Use your phone's location or enter a town to see what to wear today.</div>
+  <div id="weatherEmpty" class="weather-empty" hidden></div>
   <div id="weatherReady" hidden>
     <div class="weather-main"><span id="weatherIcon" class="weather-condition-icon" aria-hidden="true"></span><div><div id="weatherTemp" class="weather-temp">—</div><div class="weather-now" id="weatherFeels">Weather near you</div><span id="weatherCondition" hidden></span></div></div>
     <ul id="weatherObservations" class="weather-observations"></ul>
@@ -302,7 +302,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
     <div class="weather-meta"><span id="weatherUpdated"></span><span>·</span><a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer">Weather by Open-Meteo</a><span>(<a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer">CC BY 4.0</a>)</span><span>·</span><span>General clothing guidance</span></div>
   </div>
   <div class="weather-location-options" id="weatherLocationOptions" hidden>
-     <p>Use your current location, or choose a town if location access is unavailable.</p>
+     <p>Choose your preferred location.</p>
      <div class="weather-controls">
        <button type="button" id="weatherUseLocation" onclick="useWardrobeLocation()">Use my location</button>
        <form class="weather-town-form" onsubmit="chooseWardrobeTown(event)">
@@ -458,7 +458,7 @@ function tile(x,showBuyNow=false,showWishlistStatus=false){
 }
 function render(){let it=records.filter(x=>x.kind==='item'&&!x.archived),os=records.filter(x=>x.kind==='outfit');$('nItems').textContent=it.length;$('nOutfits').textContent=os.filter(x=>x.status==='Ready').length;$('nWish').textContent=it.filter(x=>x.status!=='Owned').length+os.filter(x=>x.status!=='Ready').length+os.filter(o=>o.status!=='Ready').reduce((n,o)=>n+needToFindCount(o),0);$('recent').innerHTML=it.slice(-4).reverse().map(tile).join('')||empty('Your wardrobe starts here','Add a photo of your first piece.');$('homeLooks').innerHTML=os.filter(x=>x.status==='Ready').slice(-4).reverse().map(tile).join('')||empty('No ready outfits yet','Move an outfit to Ready when it is complete.');renderItems();renderOutfits();renderHolidayOutfits();renderTrips();renderWish()}
 
-const WARDROBE_APP_VERSION=115;
+const WARDROBE_APP_VERSION=116;
 document.getElementById('wardrobeInstalledVersion').textContent='v'+WARDROBE_APP_VERSION;
 
 // Only code/runtime and connectivity information is logged. Never include wardrobe records or photos.
