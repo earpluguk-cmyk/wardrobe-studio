@@ -243,7 +243,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 .weather-mini-button{border:0;background:none;color:#70695f;font-size:11px;padding:6px 3px;cursor:pointer}
 .weather-mini-button:disabled{opacity:.5;cursor:wait}
 .weather-refresh{font-size:20px;line-height:1;padding:1px 4px}
-.weather-status{font-size:12px;line-height:1.5;color:#786f64;margin:9px 0 0}
+.weather-progress-line{display:flex;align-items:center;gap:7px;margin:9px 0 0}.weather-status{font-size:12px;line-height:1.5;color:#786f64}
 .weather-status:empty{display:none}
 .weather-error{color:#955c4f}
 .weather-spinner{display:inline-block;border:2px solid #ddd9d1;border-top-color:#70685d;width:13px;height:13px;border-radius:50%;animation:wardrobe-spin .75s linear infinite;vertical-align:middle;margin-left:5px}
@@ -282,7 +282,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
       <button class="weather-mini-button weather-refresh" id="weatherRefresh" type="button" onclick="refreshWardrobeWeather()" aria-label="Refresh weather forecast">↻</button>
     </div>
   </div>
-  <p class="weather-status" id="weatherStatus" role="status" aria-live="polite">Finding your local forecast… <span class="weather-spinner" id="weatherSpinner" aria-hidden="true"></span></p>
+  <div class="weather-progress-line" id="weatherProgressLine"><span class="weather-spinner" id="weatherSpinner" aria-hidden="true"></span><span class="weather-status" id="weatherStatus" role="status" aria-live="polite">Finding your local forecast…</span></div>
   <div id="weatherEmpty" class="weather-empty">Use your phone's location or enter a town to see what to wear today.</div>
   <div id="weatherReady" hidden>
     <div class="weather-main"><span id="weatherIcon" class="weather-condition-icon" aria-hidden="true">☁︎</span><div><div id="weatherTemp" class="weather-temp">—</div><div class="weather-now" id="weatherFeels">Weather near you</div><span id="weatherCondition" hidden></span></div></div>
