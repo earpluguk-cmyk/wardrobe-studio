@@ -8,6 +8,7 @@ const CITY_STORAGE='wardrobe-weather-town-v1';
 const FORECAST_URL='https://api.open-meteo.com/v1/forecast';
 const GEOCODE_URL='https://geocoding-api.open-meteo.com/v1/search';
 let busy=false,activePlace=null,lastLoaded=0,usedGps=false,started=false;
+let operationKind='',gpsAttempt=0;
 function fail(source,error){
   try { if(typeof logWardrobeError==='function') logWardrobeError('Weather '+source,error); }
   catch(e) { console.warn('Weather issue',source); }
@@ -17,8 +18,9 @@ function status(text,failed=false){
  if(message){message.textContent=text;message.classList.toggle('weather-error',failed);}
  const line=node('weatherProgressLine');if(line)line.hidden=!busy&&!text;
 }
-function setBusy(value,description){
+function setBusy(value,description,kind='forecast'){
  busy=value;
+ operationKind=value?kind:'';
  const spinner=node('weatherSpinner');
  if(spinner)spinner.hidden=!value;
  const refresh=node('weatherRefresh');
@@ -26,7 +28,8 @@ function setBusy(value,description){
  const gps=node('weatherUseLocation');
  if(gps)gps.disabled=value;
  const find=node('weatherTownSubmit');
- if(find)find.disabled=value;
+ // While the phone is locating, a user can choose their town immediately.
+ if(find)find.disabled=value&&kind!=='gps';
  if(value)status(description||'Checking the forecast…');
  else {const line=node('weatherProgressLine');const message=node('weatherStatus');if(line)line.hidden=!(message&&message.textContent);}
 }
@@ -219,30 +222,57 @@ async function loadPlace(place,isGPS){
 function geoPosition(){
  return new Promise((resolve,reject)=>{
    if(!navigator.geolocation){reject(Error('Location is not supported by this browser'));return;}
-   navigator.geolocation.getCurrentPosition(resolve,reject,{enableHighAccuracy:false,timeout:12000,maximumAge:15*60*1000});
+   let finished=false;
+   const finish=(value,error)=>{
+     if(finished)return;
+     finished=true;
+     clearTimeout(hardLimit);
+     if(error)reject(error);else resolve(value);
+   };
+   // iOS can leave permission prompts unresolved; a separate timer bounds the wait.
+   const hardLimit=setTimeout(()=>finish(null,Error('Location took too long. Please choose a town.')),9000);
+   try{
+     navigator.geolocation.getCurrentPosition(
+       position=>finish(position,null),
+       error=>finish(null,error),
+       {enableHighAccuracy:false,timeout:8000,maximumAge:15*60*1000}
+     );
+   }catch(error){finish(null,error)}
  });
 }
 async function useWardrobeLocation(){
  if(busy)return;
- setBusy(true,'Checking your phone’s location…');
+ const attempt=++gpsAttempt;
+ showLocationOptions(true);
+ setBusy(true,'Checking your phone’s location…', 'gps');
  try{
   const position=await geoPosition();
+  if(attempt!==gpsAttempt)return; // A town choice has superseded this GPS attempt.
   const coords=position.coords;
   if(!Number.isFinite(coords.latitude)||!Number.isFinite(coords.longitude))throw Error('Location unavailable');
-  try{localStorage.removeItem(CITY_STORAGE)}catch(e){}
-  // Release the loading state before making the separate forecast request.
+  // Release the GPS state before the separate forecast request.
   setBusy(false);
   await loadPlace({latitude:coords.latitude,longitude:coords.longitude,label:'Current location'},true);
+  if(attempt===gpsAttempt&&activePlace&&usedGps){
+    try{localStorage.removeItem(CITY_STORAGE)}catch(e){}
+  }
  }catch(err){
+  if(attempt!==gpsAttempt)return;
   fail('location',err);
   status('Location isn’t available. Enter a town instead, or try again.',true);
   showLocationOptions(true);
-  node('weatherEmpty').hidden=false;
- }finally{setBusy(false)}
+  if(!lastLoaded)node('weatherEmpty').hidden=false;
+ }finally{
+  // Don't interrupt a forecast started from manually entering a town.
+  if(attempt===gpsAttempt&&operationKind==='gps')setBusy(false);
+ }
 }
 async function chooseWardrobeTown(event){
  if(event)event.preventDefault();
- if(busy)return;
+ if(busy&&operationKind==='gps'){
+   gpsAttempt++; // Ignore an outstanding geolocation callback.
+   setBusy(false);
+ }else if(busy)return;
  const name=node('weatherTownInput').value.trim();
  if(name.length<2){status('Please enter a town or city.',true);return;}
  setBusy(true,'Finding '+name+'…');
@@ -286,7 +316,8 @@ function startWardrobeWeather(){
  if(saved&&Number.isFinite(saved.latitude)&&Number.isFinite(saved.longitude)){
    loadPlace(saved,false);return;
  }
- // Ask once via the browser's own location permission; a refusal never blocks the wardrobe.
+ // Show a usable alternative immediately, even while phone location is being checked.
+ showLocationOptions(true);
  useWardrobeLocation();
  document.addEventListener('visibilitychange',()=>{
    if(document.visibilityState==='visible'&&lastLoaded&&Date.now()-lastLoaded>75*60*1000&&navigator.onLine!==false)refreshWardrobeWeather();
