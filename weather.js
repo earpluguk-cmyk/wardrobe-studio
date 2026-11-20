@@ -15,6 +15,7 @@ function fail(source,error){
 function status(text,failed=false){
  const message=node('weatherStatus');
  if(message){message.textContent=text;message.classList.toggle('weather-error',failed);}
+ const line=node('weatherProgressLine');if(line)line.hidden=!busy&&!text;
 }
 function setBusy(value,description){
  busy=value;
@@ -27,6 +28,7 @@ function setBusy(value,description){
  const find=node('weatherTownSubmit');
  if(find)find.disabled=value;
  if(value)status(description||'Checking the forecast…');
+ else {const line=node('weatherProgressLine');const message=node('weatherStatus');if(line)line.hidden=!(message&&message.textContent);}
 }
 function showLocationOptions(show){
  const el=node('weatherLocationOptions');
@@ -143,7 +145,7 @@ function weatherBrief(data){
 function renderBrief(result,label){
  node('weatherLocationLabel').textContent=label||'Your location';
  node('weatherTemp').textContent=result.temperature+'°C';
- node('weatherFeels').textContent='Feels like '+result.feels+'°C';
+ node('weatherFeels').textContent=result.condition;
  node('weatherIcon').textContent=result.icon;
  node('weatherCondition').textContent=result.condition;
  const list=node('weatherObservations');
