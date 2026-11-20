@@ -140,7 +140,7 @@ function weatherBrief(data){
  }
  const cond=describeCode(Number(cur.weather_code)||0);
  return {temperature:Math.round(temp),feels:Math.round(feel),condition:cond,icon:weatherSymbol(Number(cur.weather_code)||0),
-   observations:notes,title,detail,rainLabel,updated:Date.now()};
+   observations:notes,title,detail,rainLabel,precipType:snow?'Snow possible':'Rain expected',updated:Date.now()};
 }
 function renderBrief(result,label){
  node('weatherLocationLabel').textContent=label||'Your location';
@@ -159,6 +159,7 @@ function renderBrief(result,label){
  node('weatherWearTitle').textContent=result.title;
  node('weatherWearDetail').textContent=result.detail;
  node('weatherRain').textContent=result.rainLabel;
+ node('weatherRainHeading').textContent=result.precipType;
  node('weatherFeelsTile').textContent=result.feels+'°C';
  node('weatherUpdated').textContent='Updated '+new Date(result.updated).toLocaleTimeString('en-GB',{hour:'numeric',minute:'2-digit'});
  node('weatherReady').hidden=false;
