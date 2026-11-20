@@ -380,7 +380,7 @@ function tile(x,showBuyNow=false,showWishlistStatus=false){
 }
 function render(){let it=records.filter(x=>x.kind==='item'&&!x.archived),os=records.filter(x=>x.kind==='outfit');$('nItems').textContent=it.length;$('nOutfits').textContent=os.filter(x=>x.status==='Ready').length;$('nWish').textContent=it.filter(x=>x.status!=='Owned').length+os.filter(x=>x.status!=='Ready').length+os.filter(o=>o.status!=='Ready').reduce((n,o)=>n+needToFindCount(o),0);$('recent').innerHTML=it.slice(-4).reverse().map(tile).join('')||empty('Your wardrobe starts here','Add a photo of your first piece.');$('homeLooks').innerHTML=os.filter(x=>x.status==='Ready').slice(-4).reverse().map(tile).join('')||empty('No ready outfits yet','Move an outfit to Ready when it is complete.');renderItems();renderOutfits();renderHolidayOutfits();renderTrips();renderWish()}
 
-const WARDROBE_APP_VERSION=110;
+const WARDROBE_APP_VERSION=111;
 document.getElementById('wardrobeInstalledVersion').textContent='v'+WARDROBE_APP_VERSION;
 
 // Only code/runtime and connectivity information is logged. Never include wardrobe records or photos.
@@ -853,6 +853,7 @@ async function storageInfo(){const photoBytes=records.reduce((a,x)=>a+(x.photo?.
   records=await all();
  }catch(error){
   console.error('Wardrobe database could not be opened:',error);
+  logWardrobeError('Database startup',error);
   alert('Could not access this browser\'s wardrobe storage. Your data has not been cleared. Please reopen the app. Do not delete website data or restore a backup until the issue is checked.');
   return;
  }
@@ -867,9 +868,10 @@ async function storageInfo(){const photoBytes=records.reduce((a,x)=>a+(x.photo?.
   if(['home','clothing','outfits','wishlist','holiday'].includes(saved))remembered=saved;
  }catch(e){}
  go(remembered,true);
- if('serviceWorker'in navigator)navigator.serviceWorker.register('./sw.js',{updateViaCache:'none'}).then(reg=>reg.update()).catch(()=>{});
+ if('serviceWorker'in navigator)navigator.serviceWorker.register('./sw.js',{updateViaCache:'none'}).then(reg=>reg.update()).catch(error=>logWardrobeError('Offline app setup',error));
 })().catch(error=>{
  console.error('Wardrobe startup failed:',error);
+ logWardrobeError('App startup',error);
  alert('Your wardrobe could not finish loading. Please reopen the app. Do not clear your browser data.');
 });
 </script></body></html>
