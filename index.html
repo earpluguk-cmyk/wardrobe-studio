@@ -219,7 +219,19 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 
 /* Smart outfit suggestions */
 .smart-weather,.smart-suggestions{margin:20px 0;background:#fff;border:1px solid var(--line);border-radius:18px;padding:16px}.smart-weather h2,.smart-suggestions h2{font:23px Georgia,serif;margin:0 0 7px}.smart-weather p,.smart-suggestions p{font-size:12px;color:var(--muted);line-height:1.5}.smart-controls{display:flex;gap:8px;margin:12px 0}.smart-controls input{flex:1;min-width:0;padding:12px;border:1px solid var(--line);border-radius:12px;background:#faf9f7}.smart-controls button,.smart-card button{border:1px solid var(--line);border-radius:20px;background:#f5f3ef;padding:9px 12px;font-size:12px}.smart-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.smart-card{border:1px solid var(--line);border-radius:14px;overflow:hidden;min-width:0}.smart-card img{width:100%;aspect-ratio:4/5;object-fit:cover;display:block}.smart-card-body{padding:10px}.smart-card strong{font-size:13px;display:block}.smart-card p{margin:7px 0 10px}.smart-card button{width:100%}.smart-meta{font-size:11px;color:var(--muted)}@media(max-width:650px){.smart-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.smart-controls{flex-wrap:wrap}.smart-controls input{flex-basis:100%}.smart-card:last-child:nth-child(odd){grid-column:span 2;max-width:65%}}
-.smart-weather-main{display:flex;align-items:center;gap:16px;padding:10px 0}.smart-weather-icon{font-size:45px;line-height:1}.smart-weather-main strong{display:block;font:36px Georgia,serif;color:#3d3832}.smart-weather-main span:not(.smart-weather-icon){display:block;color:#746c62;font-size:13px;margin-top:4px}.smart-weather-facts{display:flex;gap:8px;flex-wrap:wrap;margin-top:9px}.smart-weather-facts span{background:#f5f3ef;color:#655e56;border-radius:20px;padding:8px 10px;font-size:11px}.smart-weather p{margin-bottom:0}.smart-version{font:normal 10px system-ui,sans-serif;color:#847a70;vertical-align:middle;margin-left:6px;white-space:nowrap}.settings-version-panel{background:#fff;border:1px solid var(--line);border-radius:17px;padding:17px;margin:0 0 16px}.settings-version-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}.settings-version-top strong{font-size:15px}.settings-version-panel p{font-size:12px;line-height:1.55;color:#736c62;margin:6px 0 11px}.settings-version-badge{font-size:11px;white-space:nowrap;background:#f5f3ef;padding:7px 10px;border-radius:16px;color:#625c53}.settings-version-actions{display:flex;gap:8px;flex-wrap:wrap}.settings-version-actions button{font-size:12px}.smart-weather-retry{margin-top:12px;padding:8px 12px}.smart-wait{grid-column:1/-1;line-height:1.55;color:#746c62}.smart-weather #smartWeatherText{font-size:13px}.smart-controls button,.smart-controls button[type='button'],.smart-controls button[type='submit']{appearance:none;-webkit-appearance:none;background:#f5f3ef!important;color:#302d29!important;border:1px solid #e7e3dc!important;box-shadow:none!important}.smart-controls button[type='submit']{background:#433e37!important;color:#fff!important;border-color:#433e37!important}.smart-weather-retry{color:#302d29!important;background:#fff!important}.smart-week{display:flex;gap:9px;overflow-x:auto;scroll-snap-type:x mandatory;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;margin:15px -2px 0;padding:2px 2px 9px;scrollbar-width:thin}.smart-day{scroll-snap-align:start;min-width:88px;flex:0 0 88px;display:flex;flex-direction:column;align-items:center;gap:6px;border:1px solid #e5e0d8;border-radius:14px;background:#f8f6f2;color:#3f3932;padding:12px 8px;font-size:12px;box-shadow:none;appearance:none;-webkit-appearance:none}.smart-day.active{border-color:#665b4e;background:#eae3d9}.smart-day span{font-size:11px}.smart-day b{font-size:28px;font-weight:400}.smart-day strong{font-size:18px}.smart-day small{font-size:11px;color:#7b7166}.smart-weather-period{color:#6f665b;font-size:12px;font-weight:600;margin-top:12px}
+.smart-weather-main{display:flex;align-items:center;gap:16px;padding:10px 0}.smart-weather-icon{font-size:45px;line-height:1}.smart-weather-main strong{display:block;font:36px Georgia,serif;color:#3d3832}.smart-weather-main span:not(.smart-weather-icon){display:block;color:#746c62;font-size:13px;margin-top:4px}.smart-weather-facts{display:flex;gap:8px;flex-wrap:wrap;margin-top:9px}.smart-weather-facts span{background:#f5f3ef;color:#655e56;border-radius:20px;padding:8px 10px;font-size:11px}.smart-weather p{margin-bottom:0}.smart-version{font:normal 10px system-ui,sans-serif;color:#847a70;vertical-align:middle;margin-left:6px;white-space:nowrap}.settings-version-panel{background:#fff;border:1px solid var(--line);border-radius:17px;padding:17px;margin:0 0 16px}.settings-version-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}.settings-version-top strong{font-size:15px}.settings-version-panel p{font-size:12px;line-height:1.55;color:#736c62;margin:6px 0 11px}.settings-version-badge{font-size:11px;white-space:nowrap;background:#f5f3ef;padding:7px 10px;border-radius:16px;color:#625c53}.settings-version-actions{display:flex;gap:8px;flex-wrap:wrap}.settings-version-actions button{font-size:12px}
+.settings-version-actions button:disabled{opacity:.55;cursor:wait}
+.wardrobe-operation{display:flex;align-items:center;gap:9px;font-size:12px;color:#655e56;padding:8px 0}
+.wardrobe-operation[hidden]{display:none}
+.wardrobe-spinner{display:inline-block;width:15px;height:15px;border:2px solid #d4d1ca;border-top-color:#49453e;border-radius:50%;animation:wardrobe-spin .75s linear infinite}
+@keyframes wardrobe-spin{to{transform:rotate(360deg)}}
+.wardrobe-diagnostics{margin-top:15px;border-top:1px solid var(--line);padding-top:13px}
+.wardrobe-diagnostics summary{cursor:pointer;font-size:13px;font-weight:600;display:flex;gap:10px;align-items:center;justify-content:space-between}
+.wardrobe-diagnostics summary span{font-size:11px;color:var(--muted);font-weight:400;text-align:right}
+.wardrobe-diagnostics-copy{font-size:12px;line-height:1.5;color:var(--muted)}
+.wardrobe-diagnostics-report{background:#f8f7f4;border:1px solid var(--line);border-radius:12px;padding:12px;white-space:pre-wrap;overflow-wrap:anywhere;overflow-x:auto;color:#464039;font:11px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace;max-height:340px;overflow-y:auto}
+#wardrobeDiagnosticAction{font-size:12px;line-height:1.45;color:#665d54}
+.smart-weather-retry{margin-top:12px;padding:8px 12px}.smart-wait{grid-column:1/-1;line-height:1.55;color:#746c62}.smart-weather #smartWeatherText{font-size:13px}.smart-controls button,.smart-controls button[type='button'],.smart-controls button[type='submit']{appearance:none;-webkit-appearance:none;background:#f5f3ef!important;color:#302d29!important;border:1px solid #e7e3dc!important;box-shadow:none!important}.smart-controls button[type='submit']{background:#433e37!important;color:#fff!important;border-color:#433e37!important}.smart-weather-retry{color:#302d29!important;background:#fff!important}.smart-week{display:flex;gap:9px;overflow-x:auto;scroll-snap-type:x mandatory;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;margin:15px -2px 0;padding:2px 2px 9px;scrollbar-width:thin}.smart-day{scroll-snap-align:start;min-width:88px;flex:0 0 88px;display:flex;flex-direction:column;align-items:center;gap:6px;border:1px solid #e5e0d8;border-radius:14px;background:#f8f6f2;color:#3f3932;padding:12px 8px;font-size:12px;box-shadow:none;appearance:none;-webkit-appearance:none}.smart-day.active{border-color:#665b4e;background:#eae3d9}.smart-day span{font-size:11px}.smart-day b{font-size:28px;font-weight:400}.smart-day strong{font-size:18px}.smart-day small{font-size:11px;color:#7b7166}.smart-weather-period{color:#6f665b;font-size:12px;font-weight:600;margin-top:12px}
 </style></head><body>
 <div class="shell"><header class="top"><div><div class="brand">My Wardrobe</div><div class="eyebrow">Your personal style archive</div></div><div class="top-actions"><button class="settings-icon" type="button" aria-label="Settings" title="Settings" onclick="go('settings',true)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8.25a3.75 3.75 0 1 0 0 7.5 3.75 3.75 0 0 0 0-7.5Z"/><path d="m19.4 13.5 1.1.85-1.1 1.9-1.35-.45a7.9 7.9 0 0 1-1.45.85l-.25 1.4h-2.2l-.35-1.35a7.9 7.9 0 0 1-1.65 0l-.8 1.15-1.9-1.1.45-1.35a7.9 7.9 0 0 1-.85-1.45l-1.4-.25v-2.2l1.35-.35a7.9 7.9 0 0 1 0-1.65l-1.15-.8 1.1-1.9 1.35.45a7.9 7.9 0 0 1 1.45-.85l.25-1.4h2.2l.35 1.35a7.9 7.9 0 0 1 1.65 0l.8-1.15 1.9 1.1-.45 1.35a7.9 7.9 0 0 1 .85 1.45l1.4.25v2.2l-1.35.35a7.9 7.9 0 0 1 0 1.65Z"/></svg></button><button onclick="openForm('item')">＋ Add item</button></div></header>
 <section class="page active" id="home"><div class="backup-reminder" id="homeBackupReminder"><div class="backup-reminder-top"><h3>Keep your wardrobe backed up</h3><span class="backup-reminder-tag">Backup due</span></div><p id="homeBackupReminderText">Save a fresh copy of your clothing, outfits and photos.</p><button class="secondary" onclick="openBackupSave()">Go to backup</button></div><div class="hero"><small>THE EDIT · YOUR WARDROBE</small><h1>Get dressed with a little more intention.</h1><p>Your pieces, outfit ideas and future finds in one place.</p><div class="stats"><div class="stat"><b id="nItems">0</b><span>Pieces</span></div><div class="stat"><b id="nOutfits">0</b><span>Outfits</span></div><div class="stat"><b id="nWish">0</b><span>Wishlist</span></div></div></div><div class="head"><div><h2>Recently added</h2><p>Your wardrobe at a glance</p></div><button class="secondary" onclick="go('clothing')">View all</button></div><div class="grid" id="recent"></div><div class="head"><div><h2>Ready outfits</h2><p>Looks you've completed</p></div><button class="secondary" onclick="go('outfits')">View all</button></div><div class="grid" id="homeLooks"></div></section>
@@ -228,7 +240,18 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 <section class="page" id="outfits"><div class="head"><div><h2>Outfits</h2><p>All your outfits, organised by status</p></div><button class="primary" onclick="openForm('outfit')">＋ New outfit</button></div><input class="search" id="outfitQ" placeholder="Search outfits, season, notes…" oninput="renderOutfits()"><div class="filter-layout"><div class="chips outfit-category-chips" id="outfitChips"></div><div class="filter-pair"><div id="suitabilityChips"></div><div id="seasonChips"></div></div></div><div class="grid" id="outfitGrid"></div></section>
 <section class="page" id="holiday"><div class="head"><div><h2>Holiday</h2><p>Your holiday looks and trip plans</p></div><button class="primary" onclick="createTrip()">＋ New trip</button></div><div class="head holiday-section-head"><div><h2>Holiday outfits</h2><p>Ready-to-wear looks for your trips</p></div><button class="secondary" onclick="openHolidayOutfitForm()">＋ New outfit</button></div><input class="search" id="holidayOutfitQ" placeholder="Search holiday outfits, season, notes…" oninput="renderHolidayOutfits()"><div class="filter-layout"><div class="chips outfit-category-chips" id="holidayOutfitChips"></div><div class="filter-pair"><div id="holidaySuitabilityChips"></div><div id="holidaySeasonChips"></div></div></div><div class="grid" id="holidayOutfitGrid"></div><div class="head holiday-planner-head"><div><h2>Trip planner</h2><p>Plan outfits by day and occasion</p></div></div><div id="tripList"></div></section><section class="page" id="outfitDetail"><button class="detail-back" onclick="go(detailReturnPage)">← Back</button><div id="outfitDetailContent"></div></section><section class="page" id="itemDetail"><button class="detail-back" onclick="go(detailReturnPage)">← Back</button><div id="itemDetailContent"></div></section>
 <section class="page" id="wishlist"><div class="head"><div><h2>Wishlist</h2><p>Clothing to buy and outfits to finish</p></div><button class="primary" onclick="openForm('item','Need to buy')">＋ Add find</button></div><div class="head"><div><h2>Outfits to finish</h2><p>Ideas and looks still in progress</p></div></div><div class="grid" id="wishOutfitGrid"></div><div class="head"><div><h2>Clothing to buy</h2><p>Saved pieces you want to add to your wardrobe</p></div></div><div class="grid" id="wishGrid"></div><div class="head"><div><h2>Need to find</h2><p>Pieces you’ve named for an outfit but haven’t added as clothing yet</p></div></div><div class="grid" id="wishMissingGrid"></div></section>
-<section class="page" id="settings"><div class="head"><div><h2>Settings</h2><p>Keep your wardrobe organised and protected</p></div></div><section class="settings-version-panel" aria-label="App update status"><div class="settings-version-top"><div><strong>App version</strong><p>Installed: <b id="wardrobeInstalledVersion">Checking…</b> · Check what's published online</p></div><span id="wardrobeVersionBadge" class="settings-version-badge">Not checked</span></div><p id="wardrobeVersionMessage">Check whether this device has the latest published version.</p><div class="settings-version-actions"><button class="secondary" type="button" onclick="checkWardrobeVersion()">Check for updates</button><button class="secondary" type="button" id="wardrobeRefreshButton" onclick="refreshWardrobeApp()" hidden>Load latest version</button></div></section><div class="settings-hub"><button class="settings-hub-card" type="button" onclick="go('backupSettings',true)"><span class="settings-hub-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v11m0 0 4-4m-4 4-4-4"/><path d="M5 15v4a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-4"/></svg></span><span class="settings-hub-copy"><strong>Backup &amp; Restore</strong><small>Save a copy of your wardrobe, restore a backup and check storage</small></span><span class="settings-hub-arrow">›</span></button><button class="settings-hub-card" type="button" onclick="go('projectHandover',true)"><span class="settings-hub-icon">▤</span><span class="settings-hub-copy"><strong>AI Project Handover</strong><small>Live repository details, project structure and development notes</small></span><span class="settings-hub-arrow">›</span></button><button class="settings-hub-card" type="button" onclick="go('wardrobeCheck',true)"><span class="settings-hub-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 11.5 11 13.5 15.5 8.5"/><path d="M12 3 19 6v5c0 4.6-2.9 8-7 10-4.1-2-7-5.4-7-10V6l7-3Z"/></svg></span><span class="settings-hub-copy"><strong>Wardrobe Check</strong><small>Review outfit links and find missing clothing details</small></span><span class="settings-hub-arrow">›</span></button></div></section><section class="page" id="backupSettings"><button class="detail-back" type="button" onclick="go('settings',true)">← Settings</button><div class="head"><div><h2>Backup &amp; Restore</h2><p>Protect the pieces and outfits you’ve saved</p></div></div><div class="head"><div><h2>Backup & privacy</h2><p>Your data stays on this device</p></div></div><div class="backup"><h3>Your wardrobe is private</h3><p>Clothing details and photos are saved in this browser on your iPhone. They are not uploaded to this public website. Clearing Safari website data or losing your phone can remove them, so keep regular backups.</p></div><div class="backup"><h3>Save a backup</h3><p>Export your clothing, outfits and photos into one file. Save it to iCloud Drive or Files.</p><button class="primary" id="downloadBackupButton" onclick="exportBackup()">Download backup</button></div><div class="backup"><h3>Restore a backup</h3><p>Choose a previous backup. Restoring replaces your current wardrobe, so export a backup first.</p><div class="restore-file-wrap"><label for="restoreFile">Backup file</label><input class="restore-file" type="file" id="restoreFile" accept=".json,application/json" onchange="clearRestoreStatus()"></div><button class="primary" style="margin-top:3px" onclick="restoreBackup()">Restore backup</button><div id="restoreStatus" class="restore-status" role="status" aria-live="polite"></div></div><div class="backup"><h3>Storage monitor</h3><p id="storageInfo">Checking browser storage…</p><div id="storageMeter" class="storage-meter"><span id="storageMeterFill"></span></div><p id="storageDetails" class="notice">Checking available storage information…</p></div><div class="backup"><h3>Backup status</h3><p id="backupStatus">No backup date recorded on this device yet.</p><p class="notice">This records when you last downloaded a backup here. It cannot confirm where the file was saved.</p></div><p class="notice">On iPhone: open this site in Safari, tap Share, then Add to Home Screen. Keep a separate backup in iCloud Drive.</p></section><section class="page" id="projectHandover"><button class="detail-back" onclick="go('settings',true)">← Settings</button><div class="head"><div><h2>AI Project Handover</h2><p>Project information for future development</p></div></div><div class="backup"><h3>Live project snapshot</h3><p>Repository details refresh from GitHub when this page opens.</p><p id="projectLiveStatus" class="notice">Connecting to GitHub…</p><button class="secondary" onclick="refreshProjectHandover()">Refresh project information</button></div><div class="backup"><h3>Project identity</h3><p><strong>Application:</strong> My Wardrobe / Wardrobe Studio<br><strong>Repository:</strong> <a href="https://github.com/earpluguk-cmyk/wardrobe-studio" target="_blank" rel="noopener">earpluguk-cmyk/wardrobe-studio</a><br><strong>Live website:</strong> <a href="https://earpluguk-cmyk.github.io/wardrobe-studio/" target="_blank" rel="noopener">GitHub Pages</a><br><strong>Hosting:</strong> GitHub Pages<br><strong>Branch:</strong> main</p><div id="projectRepoDetails" class="notice"></div></div><div class="backup"><h3>Technology &amp; data</h3><p>Single-page app using HTML, CSS and vanilla JavaScript. Wardrobe records are stored in browser IndexedDB (database <strong>wardrobe-studio</strong>, version 1). Photos are stored with records. A service worker handles offline caching; a web app manifest supports installation.</p><p class="notice">Wardrobe data is stored locally in the browser/device. It does not automatically sync to GitHub or another device. Use Backup &amp; Restore to move or protect wardrobe data.</p></div><div class="backup"><h3>Application areas &amp; rules</h3><p>Home · Clothing · Outfits · Wishlist · Holiday · Settings · Backup &amp; Restore · Wardrobe Check.</p><p class="notice">Clothing can belong to multiple contexts and seasons. Summer and Holiday remain available as categories/filters. Outfit progress labels belong on the Wishlist page, not the Outfit page.</p></div><div class="backup"><h3>Repository files</h3><div id="projectFileList" class="notice">Loading…</div></div><div class="backup"><h3>Latest change</h3><div id="projectLatestCommit" class="notice">Loading…</div></div><p class="notice">Live repository metadata is fetched from GitHub. The descriptive architecture and product rules are maintained in this handover page and should be updated when those change.</p></section><section class="page" id="wardrobeCheck"><button class="detail-back" type="button" onclick="go('settings',true)">← Settings</button><div class="head"><div><h2>Wardrobe Check</h2><p>A clear view of your saved wardrobe</p></div></div><p class="settings-note">A quick check of your saved wardrobe. These checks do not change any clothing or outfit records.</p><div class="audit-stats" id="auditStats"></div><section class="audit-section"><h3>Not in an outfit</h3><p>Clothing pieces that are not currently linked to any saved outfit. This is not necessarily a problem.</p><div class="audit-list" id="auditUnlinked"></div></section><section class="audit-section"><h3>Missing details</h3><p>Items and outfits with useful information still to add.</p><div class="audit-list" id="auditMissing"></div></section><section class="audit-section"><h3>Clothing used in outfits</h3><p>Pieces linked to at least one saved outfit.</p><div class="audit-list" id="auditLinked"></div></section></section></div><nav class="bottom"><div class="nav"><button class="active" data-page="home" onclick="go('home',true)"><span>⌂</span>Home</button><button data-page="clothing" onclick="go('clothing',true)"><span>▧</span>Clothing</button><button data-page="outfits" onclick="go('outfits',true)"><span>◫</span>Outfits</button><button data-page="wishlist" onclick="go('wishlist',true)"><span>♡</span>Wishlist</button><button data-page="holiday" onclick="go(&quot;holiday&quot;,true)"><span>☼︎</span>Holiday</button></div></nav>
+<section class="page" id="settings"><div class="head"><div><h2>Settings</h2><p>Keep your wardrobe organised and protected</p></div></div><section class="settings-version-panel" aria-label="App update status">
+<div class="settings-version-top"><div><strong>App version</strong><p>Installed: <b id="wardrobeInstalledVersion">Checking…</b> · Published: <b id="wardrobePublishedVersion">Not checked</b></p></div><span id="wardrobeVersionBadge" class="settings-version-badge">Not checked</span></div>
+<p id="wardrobeVersionMessage" role="status" aria-live="polite">Check for a newer published version without affecting your saved wardrobe.</p>
+<div id="wardrobeUpdateProgress" class="wardrobe-operation" hidden role="status" aria-live="polite"><span class="wardrobe-spinner" aria-hidden="true"></span><span id="wardrobeUpdateProgressText">Checking…</span></div>
+<div class="settings-version-actions"><button class="secondary" type="button" id="wardrobeCheckButton" onclick="checkWardrobeVersion()">Check for updates</button><button class="secondary" type="button" id="wardrobeRefreshButton" onclick="installWardrobeUpdate()" hidden>Install latest version</button></div>
+<details class="wardrobe-diagnostics"><summary>Website diagnostics <span id="wardrobeDiagnosticsCount">No errors recorded</span></summary>
+<p class="wardrobe-diagnostics-copy">Checks this browser's app, saved-data access and published version. It also records JavaScript errors while the app is open. This cannot detect every server or device issue. No clothing or photos are included in the report.</p>
+<div class="settings-version-actions"><button class="secondary" type="button" id="wardrobeHealthButton" onclick="runWardrobeHealthCheck()">Run health check</button><button class="secondary" type="button" onclick="copyWardrobeDiagnostics()">Copy report</button></div>
+<p id="wardrobeDiagnosticAction" role="status" aria-live="polite"></p>
+<pre id="wardrobeDiagnosticsReport" class="wardrobe-diagnostics-report">Open diagnostics to check the app.</pre>
+</details>
+</section><div class="settings-hub"><button class="settings-hub-card" type="button" onclick="go('backupSettings',true)"><span class="settings-hub-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v11m0 0 4-4m-4 4-4-4"/><path d="M5 15v4a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-4"/></svg></span><span class="settings-hub-copy"><strong>Backup &amp; Restore</strong><small>Save a copy of your wardrobe, restore a backup and check storage</small></span><span class="settings-hub-arrow">›</span></button><button class="settings-hub-card" type="button" onclick="go('projectHandover',true)"><span class="settings-hub-icon">▤</span><span class="settings-hub-copy"><strong>AI Project Handover</strong><small>Live repository details, project structure and development notes</small></span><span class="settings-hub-arrow">›</span></button><button class="settings-hub-card" type="button" onclick="go('wardrobeCheck',true)"><span class="settings-hub-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 11.5 11 13.5 15.5 8.5"/><path d="M12 3 19 6v5c0 4.6-2.9 8-7 10-4.1-2-7-5.4-7-10V6l7-3Z"/></svg></span><span class="settings-hub-copy"><strong>Wardrobe Check</strong><small>Review outfit links and find missing clothing details</small></span><span class="settings-hub-arrow">›</span></button></div></section><section class="page" id="backupSettings"><button class="detail-back" type="button" onclick="go('settings',true)">← Settings</button><div class="head"><div><h2>Backup &amp; Restore</h2><p>Protect the pieces and outfits you’ve saved</p></div></div><div class="head"><div><h2>Backup & privacy</h2><p>Your data stays on this device</p></div></div><div class="backup"><h3>Your wardrobe is private</h3><p>Clothing details and photos are saved in this browser on your iPhone. They are not uploaded to this public website. Clearing Safari website data or losing your phone can remove them, so keep regular backups.</p></div><div class="backup"><h3>Save a backup</h3><p>Export your clothing, outfits and photos into one file. Save it to iCloud Drive or Files.</p><button class="primary" id="downloadBackupButton" onclick="exportBackup()">Download backup</button></div><div class="backup"><h3>Restore a backup</h3><p>Choose a previous backup. Restoring replaces your current wardrobe, so export a backup first.</p><div class="restore-file-wrap"><label for="restoreFile">Backup file</label><input class="restore-file" type="file" id="restoreFile" accept=".json,application/json" onchange="clearRestoreStatus()"></div><button class="primary" style="margin-top:3px" onclick="restoreBackup()">Restore backup</button><div id="restoreStatus" class="restore-status" role="status" aria-live="polite"></div></div><div class="backup"><h3>Storage monitor</h3><p id="storageInfo">Checking browser storage…</p><div id="storageMeter" class="storage-meter"><span id="storageMeterFill"></span></div><p id="storageDetails" class="notice">Checking available storage information…</p></div><div class="backup"><h3>Backup status</h3><p id="backupStatus">No backup date recorded on this device yet.</p><p class="notice">This records when you last downloaded a backup here. It cannot confirm where the file was saved.</p></div><p class="notice">On iPhone: open this site in Safari, tap Share, then Add to Home Screen. Keep a separate backup in iCloud Drive.</p></section><section class="page" id="projectHandover"><button class="detail-back" onclick="go('settings',true)">← Settings</button><div class="head"><div><h2>AI Project Handover</h2><p>Project information for future development</p></div></div><div class="backup"><h3>Live project snapshot</h3><p>Repository details refresh from GitHub when this page opens.</p><p id="projectLiveStatus" class="notice">Connecting to GitHub…</p><button class="secondary" onclick="refreshProjectHandover()">Refresh project information</button></div><div class="backup"><h3>Project identity</h3><p><strong>Application:</strong> My Wardrobe / Wardrobe Studio<br><strong>Repository:</strong> <a href="https://github.com/earpluguk-cmyk/wardrobe-studio" target="_blank" rel="noopener">earpluguk-cmyk/wardrobe-studio</a><br><strong>Live website:</strong> <a href="https://earpluguk-cmyk.github.io/wardrobe-studio/" target="_blank" rel="noopener">GitHub Pages</a><br><strong>Hosting:</strong> GitHub Pages<br><strong>Branch:</strong> main</p><div id="projectRepoDetails" class="notice"></div></div><div class="backup"><h3>Technology &amp; data</h3><p>Single-page app using HTML, CSS and vanilla JavaScript. Wardrobe records are stored in browser IndexedDB (database <strong>wardrobe-studio</strong>, version 1). Photos are stored with records. A service worker handles offline caching; a web app manifest supports installation.</p><p class="notice">Wardrobe data is stored locally in the browser/device. It does not automatically sync to GitHub or another device. Use Backup &amp; Restore to move or protect wardrobe data.</p></div><div class="backup"><h3>Application areas &amp; rules</h3><p>Home · Clothing · Outfits · Wishlist · Holiday · Settings · Backup &amp; Restore · Wardrobe Check.</p><p class="notice">Clothing can belong to multiple contexts and seasons. Summer and Holiday remain available as categories/filters. Outfit progress labels belong on the Wishlist page, not the Outfit page.</p></div><div class="backup"><h3>Repository files</h3><div id="projectFileList" class="notice">Loading…</div></div><div class="backup"><h3>Latest change</h3><div id="projectLatestCommit" class="notice">Loading…</div></div><p class="notice">Live repository metadata is fetched from GitHub. The descriptive architecture and product rules are maintained in this handover page and should be updated when those change.</p></section><section class="page" id="wardrobeCheck"><button class="detail-back" type="button" onclick="go('settings',true)">← Settings</button><div class="head"><div><h2>Wardrobe Check</h2><p>A clear view of your saved wardrobe</p></div></div><p class="settings-note">A quick check of your saved wardrobe. These checks do not change any clothing or outfit records.</p><div class="audit-stats" id="auditStats"></div><section class="audit-section"><h3>Not in an outfit</h3><p>Clothing pieces that are not currently linked to any saved outfit. This is not necessarily a problem.</p><div class="audit-list" id="auditUnlinked"></div></section><section class="audit-section"><h3>Missing details</h3><p>Items and outfits with useful information still to add.</p><div class="audit-list" id="auditMissing"></div></section><section class="audit-section"><h3>Clothing used in outfits</h3><p>Pieces linked to at least one saved outfit.</p><div class="audit-list" id="auditLinked"></div></section></section></div><nav class="bottom"><div class="nav"><button class="active" data-page="home" onclick="go('home',true)"><span>⌂</span>Home</button><button data-page="clothing" onclick="go('clothing',true)"><span>▧</span>Clothing</button><button data-page="outfits" onclick="go('outfits',true)"><span>◫</span>Outfits</button><button data-page="wishlist" onclick="go('wishlist',true)"><span>♡</span>Wishlist</button><button data-page="holiday" onclick="go(&quot;holiday&quot;,true)"><span>☼︎</span>Holiday</button></div></nav>
 <div class="modal" id="backupReminderModal"><div class="sheet"><div class="sheethead"><h3>Time to back up</h3><button type="button" class="close" onclick="snoozeBackupReminder()">✕</button></div><p class="backup-reminder-modal-copy">It’s been a while since your last wardrobe backup. Save a fresh copy of your clothing, outfits and photos to keep them protected.</p><div class="backup-reminder-modal-note">Your wardrobe is stored in this browser. A backup saved to Files or iCloud Drive gives you a separate copy.</div><div style="display:flex;gap:8px;margin-top:20px"><button type="button" class="secondary" style="flex:1" onclick="snoozeBackupReminder()">Remind me later</button><button type="button" class="primary" style="flex:1" onclick="openBackupSave()">Go to backup</button></div></div></div><div class="modal" id="restoreConfirmModal"><div class="sheet"><div class="sheethead"><h3>Confirm restore</h3><button type="button" class="close" onclick="closeRestoreConfirm()">✕</button></div><p class="restore-confirm-copy">You are about to replace the wardrobe currently saved on this device with the contents of this backup.</p><div class="restore-confirm-warning">Make sure you have downloaded a backup of your current wardrobe first. This action cannot be undone.</div><div style="display:flex;gap:8px;margin-top:20px"><button type="button" class="secondary" style="flex:1" onclick="closeRestoreConfirm()">Cancel</button><button type="button" class="primary" style="flex:1" onclick="confirmRestoreBackup()">Yes, restore</button></div></div></div><div class="modal delete-confirm-modal" id="progressValidationModal" role="dialog" aria-modal="true" aria-labelledby="progressValidationTitle"><div class="sheet delete-confirm-sheet"><div class="delete-confirm-mark" aria-hidden="true">✦</div><div class="delete-confirm-heading"><div><div class="delete-confirm-eyebrow">WARDROBE STUDIO</div><h3 id="progressValidationTitle">A little more to add</h3></div><button type="button" class="close" aria-label="Close" onclick="closeProgressValidation()">✕</button></div><p class="delete-confirm-copy">Before saving this outfit as In progress, add at least one outstanding piece.</p><div class="validation-confirm-note">You can link clothing marked Need to buy or Ordered, or select one or more pieces under Need to find.</div><div class="delete-confirm-actions"><button type="button" class="secondary" onclick="closeProgressValidation()">Back to outfit</button></div></div></div><div class="modal delete-confirm-modal" id="deleteConfirmModal" role="dialog" aria-modal="true" aria-labelledby="deleteConfirmTitle"><div class="sheet delete-confirm-sheet"><div class="delete-confirm-mark" aria-hidden="true">✦</div><div class="delete-confirm-heading"><div><div class="delete-confirm-eyebrow">WARDROBE STUDIO</div><h3 id="deleteConfirmTitle">Delete item?</h3></div><button type="button" class="close" aria-label="Close" onclick="closeDeleteConfirm()">✕</button></div><p class="delete-confirm-copy" id="deleteConfirmCopy"></p><div class="delete-confirm-note" id="deleteConfirmNote"></div><div class="delete-confirm-error" id="deleteConfirmError" role="alert" aria-live="polite"></div><div class="delete-confirm-actions"><button type="button" class="secondary" onclick="closeDeleteConfirm()">Cancel</button><button type="button" class="delete-confirm-action" id="confirmDeleteButton" onclick="confirmDeleteRecord()">Delete</button></div></div></div><div class="modal" id="tripModal"><div class="sheet"><div class="sheethead"><h3>Plan a new trip</h3><button type="button" class="close" onclick="closeTripModal()">✕</button></div><p class="notice">Add your holiday details to get your outfit plan started.</p><form onsubmit="saveTrip(event)"><div class="trip-form-field"><label for="tripName">Trip name</label><input id="tripName" type="text" placeholder="e.g. Zanzibar 2027" required></div><div class="trip-form-field"><label for="tripStartDate">Start date <span>Optional</span></label><input id="tripStartDate" type="date"></div><div class="trip-form-field"><label for="tripDays">Length of trip</label><div class="trip-days-input"><input id="tripDays" type="number" min="1" max="60" value="7" required><span>days</span></div></div><div style="display:flex;gap:8px;margin-top:20px"><button type="button" class="secondary" style="flex:1" onclick="closeTripModal()">Cancel</button><button class="primary" style="flex:1" type="submit">Create trip</button></div></form></div></div><div class="modal" id="productImportModal"><div class="sheet"><div class="sheethead"><h3>Find a product</h3><button class="close" type="button" onclick="closeProductImporter()">✕</button></div><p class="settings-note">Paste a retailer product link. Check the details before saving.</p><div class="field"><label for="productUrlInput">Product link</label><input id="productUrlInput" type="url" inputmode="url" placeholder="Paste the product page link"></div><div class="product-import-actions"><button type="button" class="primary" id="findProductButton" onclick="findProduct()">Find product</button></div><div class="product-import-status" id="productImportStatus" role="status" aria-live="polite"></div><div class="product-import-preview" id="productImportPreview"></div></div></div><div class="modal" id="modal"><div class="sheet"><div class="sheethead"><h3 id="modalTitle">Add</h3><button class="close" onclick="closeForm()">✕</button></div><form id="editor" onsubmit="saveForm(event)"><div id="fields"></div><div style="display:flex;gap:8px;margin-top:17px"><button type="button" class="secondary" style="flex:1" onclick="closeForm()">Cancel</button><button class="primary" style="flex:1" type="submit">Save</button></div></form></div></div>
 <script>
 if('scrollRestoration' in history)history.scrollRestoration='manual';
@@ -357,29 +380,215 @@ function tile(x,showBuyNow=false,showWishlistStatus=false){
 }
 function render(){let it=records.filter(x=>x.kind==='item'&&!x.archived),os=records.filter(x=>x.kind==='outfit');$('nItems').textContent=it.length;$('nOutfits').textContent=os.filter(x=>x.status==='Ready').length;$('nWish').textContent=it.filter(x=>x.status!=='Owned').length+os.filter(x=>x.status!=='Ready').length+os.filter(o=>o.status!=='Ready').reduce((n,o)=>n+needToFindCount(o),0);$('recent').innerHTML=it.slice(-4).reverse().map(tile).join('')||empty('Your wardrobe starts here','Add a photo of your first piece.');$('homeLooks').innerHTML=os.filter(x=>x.status==='Ready').slice(-4).reverse().map(tile).join('')||empty('No ready outfits yet','Move an outfit to Ready when it is complete.');renderItems();renderOutfits();renderHolidayOutfits();renderTrips();renderWish()}
 
-const WARDROBE_APP_VERSION=109;
-// Always display the version of the HTML actually running, rather than a stale static label.
+const WARDROBE_APP_VERSION=110;
 document.getElementById('wardrobeInstalledVersion').textContent='v'+WARDROBE_APP_VERSION;
-async function checkWardrobeVersion(){
- const badge=document.getElementById('wardrobeVersionBadge'),msg=document.getElementById('wardrobeVersionMessage'),refresh=document.getElementById('wardrobeRefreshButton');
- if(!badge)return;badge.textContent='Checking…';msg.textContent='Checking the published website…';refresh.hidden=true;
- const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),10000);
- try{
-  const response=await fetch('./sw.js?version-check='+Date.now(),{cache:'no-store',signal:controller.signal});
-  if(!response.ok)throw Error('Could not load published version');
-  const content=await response.text(),found=content.match(/wardrobe-studio-v(\d+)/);
-  if(!found)throw Error('Published version not found');
-  const published=Number(found[1]);
-  if(published>WARDROBE_APP_VERSION){badge.textContent='Update available';msg.textContent='This device has v'+WARDROBE_APP_VERSION+'. The website has v'+published+'.';refresh.hidden=false}
-  else if(published===WARDROBE_APP_VERSION){badge.textContent='Up to date';msg.textContent='You are using v'+WARDROBE_APP_VERSION+', the latest published website version.'}
-  else {badge.textContent='Publishing';msg.textContent='This device has v'+WARDROBE_APP_VERSION+', but the published site is reporting v'+published+'. The deployment may still be updating.'}
- }catch(e){badge.textContent='Unable to check';msg.textContent='Could not verify the published version. Your wardrobe remains available offline.'}
- finally{clearTimeout(timer)}
-}
-function refreshWardrobeApp(){
- const address=new URL(location.href);address.searchParams.set('v',String(Date.now()));location.replace(address.toString());
-}
 
+// Only code/runtime and connectivity information is logged. Never include wardrobe records or photos.
+const WARDROBE_DIAGNOSTIC_KEY='wardrobe-diagnostics-session-v1';
+let wardrobeErrors=[];
+let wardrobeHealthLines=['Health check not run yet.'];
+let wardrobePublishedVersion=null;
+function safeWardrobeError(err){
+ const message=String(err&&err.message?err.message:err||'Unknown error');
+ return message.replace(/https?:\/\/[^\s)]+/gi,'[URL omitted]').replace(/[\w.+-]+@[\w.-]+\.[A-Za-z]{2,}/g,'[email omitted]').slice(0,240);
+}
+function logWardrobeError(source,err){
+ const item={time:new Date().toISOString(),source:String(source).slice(0,60),message:safeWardrobeError(err)};
+ wardrobeErrors.push(item);
+ wardrobeErrors=wardrobeErrors.slice(-20);
+ try{sessionStorage.setItem(WARDROBE_DIAGNOSTIC_KEY,JSON.stringify(wardrobeErrors))}catch(e){}
+ renderWardrobeDiagnostics();
+}
+try{
+ const previous=JSON.parse(sessionStorage.getItem(WARDROBE_DIAGNOSTIC_KEY)||'[]');
+ if(Array.isArray(previous))wardrobeErrors=previous.slice(-20).filter(x=>x&&typeof x.message==='string');
+}catch(e){}
+window.addEventListener('error',function(event){
+ if(event.target&&event.target!==window)return;
+ logWardrobeError('JavaScript',event.error||event.message||'Script error');
+});
+window.addEventListener('unhandledrejection',function(event){logWardrobeError('Promise',event.reason||'Unhandled rejection')});
+function wardrobeBrowserLabel(){
+ const ua=navigator.userAgent||'';
+ return /CriOS/i.test(ua)?'Chrome on iPhone/iPad':/FxiOS/i.test(ua)?'Firefox on iPhone/iPad':/Safari/i.test(ua)?'Safari/WebKit':'Other browser';
+}
+function wardrobeReport(){
+ const heading=['WARDROBE DIAGNOSTICS','Generated: '+new Date().toLocaleString('en-GB'),'Running version: v'+WARDROBE_APP_VERSION,'Published version: '+(wardrobePublishedVersion===null?'Not checked':'v'+wardrobePublishedVersion),'Browser: '+wardrobeBrowserLabel(),'Connectivity: '+(navigator.onLine?'Browser reports online':'Browser reports offline'),'', 'HEALTH CHECK'];
+ const logs=wardrobeErrors.length?wardrobeErrors.map(x=>x.time+' | '+x.source+' | '+x.message):['No JavaScript errors recorded in this app session.'];
+ return heading.concat(wardrobeHealthLines,'','RECORDED ERRORS (up to 20)',logs).join('\n');
+}
+function renderWardrobeDiagnostics(){
+ const count=document.getElementById('wardrobeDiagnosticsCount'),report=document.getElementById('wardrobeDiagnosticsReport');
+ if(count)count.textContent=wardrobeErrors.length?wardrobeErrors.length+' error(s) recorded':'No errors recorded';
+ if(report)report.textContent=wardrobeReport();
+}
+function setWardrobeOperation(message,busy){
+ const progress=document.getElementById('wardrobeUpdateProgress');
+ const t=document.getElementById('wardrobeUpdateProgressText');
+ const check=document.getElementById('wardrobeCheckButton');
+ const install=document.getElementById('wardrobeRefreshButton');
+ if(progress)progress.hidden=!busy;
+ if(t)t.textContent=message||'Working…';
+ if(check)check.disabled=!!busy;
+ if(install)install.disabled=!!busy;
+}
+async function fetchWardrobePublishedVersion(){
+ if(navigator.onLine===false)throw Error('Device reports offline');
+ const controller=new AbortController();
+ const timer=setTimeout(()=>controller.abort(),12000);
+ try{
+  // A real network request: no cached version or simulated progress.
+  const token=Date.now();
+  const results=await Promise.all([
+   fetch('./sw.js?version-check='+token,{cache:'no-store',signal:controller.signal}),
+   fetch('./index.html?version-check='+token,{cache:'no-store',signal:controller.signal})
+  ]);
+  if(!results.every(r=>r.ok))throw Error('Published website could not be reached');
+  const contents=await Promise.all(results.map(r=>r.text()));
+  const worker=contents[0].match(/wardrobe-studio-v(\d+)/);
+  const page=contents[1].match(/const WARDROBE_APP_VERSION=(\d+)/);
+  if(!worker||!page)throw Error('Published files did not contain a recognisable version');
+  if(Number(worker[1])!==Number(page[1]))throw Error('Website deployment is still synchronising; please retry');
+  wardrobePublishedVersion=Number(page[1]);
+  const published=document.getElementById('wardrobePublishedVersion');
+  if(published)published.textContent='v'+wardrobePublishedVersion;
+  renderWardrobeDiagnostics();
+  return wardrobePublishedVersion;
+ }finally{clearTimeout(timer)}
+}
+async function checkWardrobeVersion(){
+ const badge=document.getElementById('wardrobeVersionBadge'),msg=document.getElementById('wardrobeVersionMessage'),install=document.getElementById('wardrobeRefreshButton');
+ if(!badge||!msg||!install)return;
+ setWardrobeOperation('Checking the live website…',true);
+ badge.textContent='Checking';
+ msg.textContent='Contacting the published website to compare versions.';
+ install.hidden=true;
+ try{
+  const published=await fetchWardrobePublishedVersion();
+  if(published>WARDROBE_APP_VERSION){
+   badge.textContent='Update available';
+   msg.textContent='Version '+published+' is available. Install it here without clearing your wardrobe data.';
+   install.hidden=false;
+  }else if(published===WARDROBE_APP_VERSION){
+   badge.textContent='Up to date';
+   msg.textContent='Your app is running v'+WARDROBE_APP_VERSION+', the latest published version.';
+  }else{
+   badge.textContent='Checking deployment';
+   msg.textContent='The published website reports an older version. Please check again shortly.';
+  }
+ }catch(error){
+  badge.textContent='Could not check';
+  msg.textContent='Could not verify the update. Check your connection and try again. Your saved wardrobe has not been changed.';
+  logWardrobeError('Update check',error);
+ }finally{setWardrobeOperation('',false)}
+}
+async function installWardrobeUpdate(){
+ const badge=document.getElementById('wardrobeVersionBadge'),msg=document.getElementById('wardrobeVersionMessage');
+ setWardrobeOperation('Verifying and downloading latest files…',true);
+ badge.textContent='Updating';
+ msg.textContent='Checking that the new version is ready before reloading.';
+ try{
+  const published=await fetchWardrobePublishedVersion();
+  if(published<=WARDROBE_APP_VERSION){
+   badge.textContent='Up to date';
+   msg.textContent='No newer version is available to install.';
+   document.getElementById('wardrobeRefreshButton').hidden=true;
+   return;
+  }
+  if('serviceWorker' in navigator){
+   setWardrobeOperation('Refreshing the app cache…',true);
+   try{
+    const registration=await navigator.serviceWorker.getRegistration('./');
+    if(registration)await Promise.race([
+      registration.update(),
+      new Promise((_,reject)=>setTimeout(()=>reject(Error('Service worker update timed out')),8000))
+    ]);
+   }catch(error){logWardrobeError('App cache update',error)}
+  }
+  // Only application files are reloaded; IndexedDB and local backups are untouched.
+  try{sessionStorage.setItem('wardrobe-pending-update',String(published))}catch(e){}
+  setWardrobeOperation('Opening the new version…',true);
+  msg.textContent='Reloading the updated website. Your wardrobe data stays in this browser.';
+  const address=new URL(location.href);
+  address.searchParams.set('v',String(published));
+  address.searchParams.set('updated',String(Date.now()));
+  location.replace(address.toString());
+ }catch(error){
+  badge.textContent='Update failed';
+  msg.textContent='Could not safely load the update. Your wardrobe has not been cleared. Try again when online.';
+  logWardrobeError('Update install',error);
+ }finally{setWardrobeOperation('',false)}
+}
+async function runWardrobeHealthCheck(){
+ const button=document.getElementById('wardrobeHealthButton');
+ const action=document.getElementById('wardrobeDiagnosticAction');
+ if(button)button.disabled=true;
+ if(action)action.textContent='Running checks…';
+ const checks=[];
+ try{
+  const required=['home','clothing','outfits','wishlist','settings'];
+  const missing=required.filter(id=>!document.getElementById(id));
+  checks.push(missing.length?'ISSUE: Missing app sections: '+missing.join(', '):'OK: Main app sections present');
+  if(typeof db==='undefined'||!db||!db.objectStoreNames.contains(STORE)){
+   checks.push('ISSUE: Wardrobe data store is not accessible');
+  }else{
+   try{
+    await new Promise((resolve,reject)=>{
+     const request=db.transaction(STORE,'readonly').objectStore(STORE).count();
+     request.onsuccess=()=>resolve();
+     request.onerror=()=>reject(request.error);
+    });
+    checks.push('OK: Wardrobe data is readable (no records copied)');
+   }catch(error){checks.push('ISSUE: Wardrobe data read failed: '+safeWardrobeError(error));logWardrobeError('Data health check',error)}
+  }
+  if('serviceWorker' in navigator){
+   try{
+    const registration=await navigator.serviceWorker.getRegistration('./');
+    checks.push(registration&&registration.active?'OK: App offline worker active':'INFO: Offline worker not yet active');
+   }catch(error){checks.push('ISSUE: App cache check failed: '+safeWardrobeError(error));logWardrobeError('Cache health check',error)}
+  }else checks.push('INFO: This browser does not expose offline worker support');
+  try{
+   const version=await fetchWardrobePublishedVersion();
+   checks.push(version===WARDROBE_APP_VERSION?'OK: App version matches published website':version>WARDROBE_APP_VERSION?'UPDATE: New version v'+version+' available':'INFO: Local app is newer than published version');
+  }catch(error){checks.push('ISSUE: Online check failed: '+safeWardrobeError(error));logWardrobeError('Connectivity health check',error)}
+ }catch(error){checks.push('ISSUE: Unexpected health check error: '+safeWardrobeError(error));logWardrobeError('Health check',error)}
+ finally{
+  wardrobeHealthLines=checks;
+  renderWardrobeDiagnostics();
+  if(action)action.textContent='Check finished. '+checks.filter(x=>x.startsWith('ISSUE:')).length+' issue(s) found in these checks.';
+  if(button)button.disabled=false;
+ }
+}
+async function copyWardrobeDiagnostics(){
+ const action=document.getElementById('wardrobeDiagnosticAction'),report=wardrobeReport();
+ try{
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+   await navigator.clipboard.writeText(report);
+  }else{
+   const area=document.createElement('textarea');area.value=report;area.setAttribute('readonly','');area.style.position='fixed';area.style.opacity='0';document.body.appendChild(area);area.select();
+   if(!document.execCommand('copy'))throw Error('Copy unavailable');
+   area.remove();
+  }
+  if(action)action.textContent='Report copied. You can paste it into ChatGPT.';
+ }catch(error){
+  if(action)action.textContent='Automatic copy was blocked. Select and copy the report shown below instead.';
+ }
+}
+try{
+ const pending=Number(sessionStorage.getItem('wardrobe-pending-update')||0);
+ if(pending){
+  sessionStorage.removeItem('wardrobe-pending-update');
+  if(WARDROBE_APP_VERSION>=pending){
+   document.getElementById('wardrobeVersionBadge').textContent='Updated';
+   document.getElementById('wardrobeVersionMessage').textContent='Updated successfully to v'+WARDROBE_APP_VERSION+'. Your wardrobe data was not cleared.';
+  }else{
+   document.getElementById('wardrobeVersionBadge').textContent='Still outdated';
+   document.getElementById('wardrobeVersionMessage').textContent='Reloaded, but the old version is still running. Check again while online.';
+   logWardrobeError('Version reload','Expected v'+pending+' but loaded v'+WARDROBE_APP_VERSION);
+  }
+ }
+}catch(e){}
+renderWardrobeDiagnostics();
 
 function itemColours(x){return Array.isArray(x.colours)?x.colours:(x.colour?[x.colour]:[])}
 function itemSeasons(x){return Array.isArray(x.seasons)?x.seasons:(x.season?[x.season]:[])}
