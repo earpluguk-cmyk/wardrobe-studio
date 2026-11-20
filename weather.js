@@ -5,6 +5,7 @@
 'use strict';
 const node=id=>document.getElementById(id);
 const CITY_STORAGE='wardrobe-weather-town-v1';
+const NEARBY_STORAGE='wardrobe-weather-approximate-v1';
 const FORECAST_URL='https://api.open-meteo.com/v1/forecast';
 const GEOCODE_URL='https://geocoding-api.open-meteo.com/v1/search';
 let busy=false,activePlace=null,lastLoaded=0,usedGps=false,started=false;
@@ -203,67 +204,100 @@ async function fetchForecast(place){
  u.searchParams.set('hourly','temperature_2m,apparent_temperature,precipitation_probability,precipitation,weather_code,wind_speed_10m,wind_gusts_10m');
  return fetchJSON(u.toString());
 }
-async function loadPlace(place,isGPS){
- if(busy)return;
+async function loadPlace(place,isGPS,approximate=false){
+ if(busy)return false;
  setBusy(true,'Checking today’s forecast…');
  try{
   const raw=await fetchForecast(place);
   const briefing=weatherBrief(raw);
-  activePlace=place;usedGps=!!isGPS;
-  renderBrief(briefing,place.label||'Your location');
+  activePlace={...place,approximate:!!approximate};usedGps=!!isGPS;
+  renderBrief(briefing,(approximate?'Approx. ':'')+(place.label||'Your location'));
   showLocationOptions(false);
+  return true;
  }catch(err){
   fail('forecast',err);
-  if(!lastLoaded){node('weatherReady').hidden=true;node('weatherEmpty').hidden=false;}
-  status('Couldn’t load a reliable forecast. Try again or choose a town.',true);
-  showLocationOptions(true);
+  if(!lastLoaded){node('weatherReady').hidden=true;node('weatherEmpty').hidden=true;}
+  status('Weather unavailable. Tap ↻ to retry.',true);
+  // Do not expose the search box on the home page without the user selecting Change.
+  return false;
  }finally{setBusy(false);}
 }
 function geoPosition(){
  return new Promise((resolve,reject)=>{
-   if(!navigator.geolocation){reject(Error('Location is not supported by this browser'));return;}
-   let finished=false;
-   const finish=(value,error)=>{
-     if(finished)return;
-     finished=true;
-     clearTimeout(hardLimit);
-     if(error)reject(error);else resolve(value);
-   };
-   // iOS can leave permission prompts unresolved; a separate timer bounds the wait.
-   const hardLimit=setTimeout(()=>finish(null,Error('Location took too long. Please choose a town.')),9000);
-   try{
-     navigator.geolocation.getCurrentPosition(
-       position=>finish(position,null),
-       error=>finish(null,error),
-       {enableHighAccuracy:false,timeout:8000,maximumAge:15*60*1000}
-     );
-   }catch(error){finish(null,error)}
+  if(!navigator.geolocation){reject(Error('Phone location not supported'));return;}
+  let finished=false;
+  const finish=(value,error)=>{
+   if(finished)return;
+   finished=true;clearTimeout(limit);
+   if(error)reject(error);else resolve(value);
+  };
+  // Chrome on iPhone can leave permission prompts unresolved. Bound the request.
+  const limit=setTimeout(()=>finish(null,Error('Phone location timed out')),6500);
+  try{
+   navigator.geolocation.getCurrentPosition(
+    position=>finish(position,null),
+    error=>finish(null,error),
+    {enableHighAccuracy:false,timeout:6000,maximumAge:15*60*1000}
+   );
+  }catch(error){finish(null,error)}
  });
+}
+// Only when phone location fails: approximate location from public IP.
+// The provider sees the connection's public IP; no IP or precise GPS is saved.
+async function approximateWeatherPlace(){
+ const providers=['https://ipwho.is/','https://ipapi.co/json/'];
+ let lastError;
+ for(const url of providers){
+  try{
+   const raw=await fetchJSON(url,5200);
+   if(raw.success===false||raw.error===true)throw Error('Approximate location unavailable');
+   const latitude=Number(raw.latitude),longitude=Number(raw.longitude);
+   if(!Number.isFinite(latitude)||!Number.isFinite(longitude)||Math.abs(latitude)>90||Math.abs(longitude)>180)throw Error('Invalid approximate coordinates');
+   const label=String(raw.city||raw.region||raw.region_name||'your area').slice(0,70);
+   return {latitude,longitude,label};
+  }catch(error){lastError=error;}
+ }
+ throw lastError||Error('Approximate location not available');
 }
 async function useWardrobeLocation(){
  if(busy)return;
  const attempt=++gpsAttempt;
- showLocationOptions(true);
- setBusy(true,'Checking your phone’s location…', 'gps');
+ // Keep town search collapsed even when the browser declines its location request.
+ showLocationOptions(false);
+ setBusy(true,'Finding your local weather…','gps');
  try{
   const position=await geoPosition();
-  if(attempt!==gpsAttempt)return; // A town choice has superseded this GPS attempt.
-  const coords=position.coords;
-  if(!Number.isFinite(coords.latitude)||!Number.isFinite(coords.longitude))throw Error('Location unavailable');
-  // Release the GPS state before the separate forecast request.
-  setBusy(false);
-  await loadPlace({latitude:coords.latitude,longitude:coords.longitude,label:'Current location'},true);
-  if(attempt===gpsAttempt&&activePlace&&usedGps){
-    try{localStorage.removeItem(CITY_STORAGE)}catch(e){}
-  }
- }catch(err){
   if(attempt!==gpsAttempt)return;
-  fail('location',err);
-  status('Location isn’t available. Enter a town instead, or try again.',true);
-  showLocationOptions(true);
-  if(!lastLoaded)node('weatherEmpty').hidden=false;
+  const coords=position.coords;
+  if(!Number.isFinite(coords.latitude)||!Number.isFinite(coords.longitude))throw Error('Phone location unavailable');
+  setBusy(false);
+  const success=await loadPlace({latitude:coords.latitude,longitude:coords.longitude,label:'Current location'},true,false);
+  if(success){
+   try{localStorage.removeItem(NEARBY_STORAGE)}catch(e){}
+  }
+ }catch(error){
+  if(attempt!==gpsAttempt)return;
+  // A permission refusal or timeout should not leave the home page unusable.
+  fail('phone location',error);
+  setBusy(true,'Finding an approximate local forecast…','gps');
+  try{
+   const place=await approximateWeatherPlace();
+   if(attempt!==gpsAttempt)return;
+   setBusy(false);
+   const success=await loadPlace(place,false,true);
+   if(success){
+    try{localStorage.setItem(NEARBY_STORAGE,JSON.stringify({place,updated:Date.now()}))}catch(e){}
+   }
+  }catch(approxError){
+   if(attempt!==gpsAttempt)return;
+   fail('approximate location',approxError);
+   status('Weather unavailable. Tap ↻ to retry or Change to choose a town.',true);
+   node('weatherEmpty').hidden=true;
+   showLocationOptions(false);
+  }finally{
+   if(attempt===gpsAttempt&&operationKind==='gps')setBusy(false);
+  }
  }finally{
-  // Don't interrupt a forecast started from manually entering a town.
   if(attempt===gpsAttempt&&operationKind==='gps')setBusy(false);
  }
 }
@@ -300,28 +334,36 @@ async function chooseWardrobeTown(event){
    showLocationOptions(true);
  }finally{setBusy(false)}
 }
-function changeWardrobeWeatherLocation(){showLocationOptions(node('weatherLocationOptions').hidden);}
+function changeWardrobeWeatherLocation(){
+ const next=node('weatherLocationOptions').hidden;
+ showLocationOptions(next);
+}
 async function refreshWardrobeWeather(){
  if(busy)return;
- if(usedGps||!activePlace){await useWardrobeLocation();return;}
- await loadPlace(activePlace,false);
+ if(!activePlace){await useWardrobeLocation();return;}
+ await loadPlace(activePlace,usedGps,!!activePlace.approximate);
 }
 function startWardrobeWeather(){
  if(started||!node('weatherCard'))return;
  started=true;
- node('weatherEmpty').hidden=false;
+ node('weatherEmpty').hidden=true;
  node('weatherReady').hidden=true;
- let saved=null;
- try{saved=JSON.parse(localStorage.getItem(CITY_STORAGE)||'null');}catch(e){}
- if(saved&&Number.isFinite(saved.latitude)&&Number.isFinite(saved.longitude)){
-   loadPlace(saved,false);return;
- }
- // Show a usable alternative immediately, even while phone location is being checked.
- showLocationOptions(true);
- useWardrobeLocation();
+ showLocationOptions(false);
  document.addEventListener('visibilitychange',()=>{
-   if(document.visibilityState==='visible'&&lastLoaded&&Date.now()-lastLoaded>75*60*1000&&navigator.onLine!==false)refreshWardrobeWeather();
+  if(document.visibilityState==='visible'&&lastLoaded&&Date.now()-lastLoaded>75*60*1000&&navigator.onLine!==false)refreshWardrobeWeather();
  });
+ let saved=null,nearby=null;
+ try{saved=JSON.parse(localStorage.getItem(CITY_STORAGE)||'null')}catch(e){}
+ try{nearby=JSON.parse(localStorage.getItem(NEARBY_STORAGE)||'null')}catch(e){}
+ if(saved&&Number.isFinite(saved.latitude)&&Number.isFinite(saved.longitude)){
+  loadPlace(saved,false,false);
+  return;
+ }
+ if(nearby&&nearby.place&&Date.now()-Number(nearby.updated)<24*60*60*1000&&Number.isFinite(nearby.place.latitude)&&Number.isFinite(nearby.place.longitude)){
+  loadPlace(nearby.place,false,true);
+  return;
+ }
+ useWardrobeLocation();
 }
 window.useWardrobeLocation=useWardrobeLocation;
 window.chooseWardrobeTown=chooseWardrobeTown;
