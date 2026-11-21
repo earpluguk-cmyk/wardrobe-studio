@@ -458,7 +458,7 @@ function tile(x,showBuyNow=false,showWishlistStatus=false){
 }
 function render(){let it=records.filter(x=>x.kind==='item'&&!x.archived),os=records.filter(x=>x.kind==='outfit');$('nItems').textContent=it.length;$('nOutfits').textContent=os.filter(x=>x.status==='Ready').length;$('nWish').textContent=it.filter(x=>x.status!=='Owned').length+os.filter(x=>x.status!=='Ready').length+os.filter(o=>o.status!=='Ready').reduce((n,o)=>n+needToFindCount(o),0);$('recent').innerHTML=it.slice(-4).reverse().map(tile).join('')||empty('Your wardrobe starts here','Add a photo of your first piece.');$('homeLooks').innerHTML=os.filter(x=>x.status==='Ready').slice(-4).reverse().map(tile).join('')||empty('No ready outfits yet','Move an outfit to Ready when it is complete.');renderItems();renderOutfits();renderHolidayOutfits();renderTrips();renderWish()}
 
-const WARDROBE_APP_VERSION=117;
+const WARDROBE_APP_VERSION=118;
 document.getElementById('wardrobeInstalledVersion').textContent='v'+WARDROBE_APP_VERSION;
 
 // Only code/runtime and connectivity information is logged. Never include wardrobe records or photos.
@@ -731,7 +731,7 @@ function renderWish(){
 }
 function checks(name,opts,sel=[]){const allSelected=opts===contexts&&contexts.every(v=>sel.includes(v));return '<div class="checks">'+opts.map(o=>'<label><input type="checkbox" name="'+name+'" value="'+o+'" '+(opts===contexts?'onchange="toggleWearAll(this)" ':'')+(sel.includes(o)?'checked':'')+'> '+o+'</label>').join('')+(opts===contexts?'<label><input type="checkbox" name="'+name+'" value="All" onchange="toggleWearAll(this)" '+(allSelected?'checked':'')+'> All</label>':'')+'</div>'}
 function toggleWearAll(el){const box=el.closest('.checks');if(!box)return;const inputs=[...box.querySelectorAll('input[type="checkbox"]')],all=inputs.find(i=>i.value==='All'),individual=inputs.filter(i=>i!==all);if(el.value==='All')individual.forEach(i=>i.checked=el.checked);else if(all)all.checked=individual.length>0&&individual.every(i=>i.checked)}
-const needToFindOptions=['Trainers','Jeans','Tracksuit bottoms','Tracksuit','Jumper','Hoodie','T-shirt','Jacket','Hat','Other'];
+const needToFindOptions=['Trainers','Jeans','Tracksuit bottoms','Tracksuit','Jumper','Hoodie','T-shirt','Shorts','Jacket','Hat','Other'];
 function needToFindItems(x){const selected=Array.isArray(x.needToFind)?x.needToFind:[],items=selected.filter(v=>v!=='N/A'&&v!=='Other');if(selected.includes('Other'))items.push(x.needToFindOther?'Other: '+x.needToFindOther:'Other');return [...items,...(x.missingItems||[])].filter(Boolean)}
 function needToFindCount(x){return needToFindItems(x).length}
 function updateNeedToFindSummary(){const inputs=[...document.querySelectorAll('input[name="needToFind"]:checked')],selected=inputs.map(i=>i.value),summary=$('needToFindSummary');if(summary)summary.innerHTML=(selected.includes('N/A')||!selected.length?'N/A':selected.length+' selected')+' <span aria-hidden="true">⌄</span>'}
