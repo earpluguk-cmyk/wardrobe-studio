@@ -648,7 +648,7 @@ document.addEventListener('keydown',e=>{
 
 function render(){let it=records.filter(x=>x.kind==='item'&&!x.archived),os=records.filter(x=>x.kind==='outfit');$('nItems').textContent=it.length;$('nOutfits').textContent=os.filter(x=>x.status==='Ready').length;$('nWish').textContent=it.filter(x=>x.status!=='Owned').length+os.filter(x=>x.status!=='Ready').length+os.filter(o=>o.status!=='Ready').reduce((n,o)=>n+needToFindCount(o),0);$('recent').innerHTML=it.slice(-4).reverse().map(tile).join('')||empty('Your wardrobe starts here','Add a photo of your first piece.');$('homeLooks').innerHTML=os.filter(x=>x.status==='Ready').slice(-4).reverse().map(tile).join('')||empty('No ready outfits yet','Move an outfit to Ready when it is complete.');renderItems();renderOutfits();renderHolidayOutfits();renderTrips();renderWish();renderGalaxy()}
 
-const WARDROBE_APP_VERSION=122;
+const WARDROBE_APP_VERSION=123;
 document.getElementById('wardrobeInstalledVersion').textContent='v'+WARDROBE_APP_VERSION;
 
 // Only code/runtime and connectivity information is logged. Never include wardrobe records or photos.
@@ -933,7 +933,7 @@ function openForm(k,status='',id=''){
   newPhoto='';newPhotos=[];
   const x=editing||{};
   const wishlistEntry=kind==='item'&&($('wishlist').classList.contains('active')||(['itemDetail','outfitDetail'].some(p=>$(p).classList.contains('active'))&&detailReturnPage==='wishlist'));
-  const availableStatuses=wishlistEntry?statuses.filter(s=>s!=='Owned'):statuses;
+  const availableStatuses=wishlistEntry&&!editing?statuses.filter(s=>s!=='Owned'):statuses;
   $('modalTitle').textContent=editing?'Edit '+k:(k==='item'?'Add clothing':'Create outfit');
   let h=`<div class="field"><label>Photo</label><input type="file" id="photoFile" accept="image/*"><img id="preview" class="preview" src="${x.photo||''}" style="${x.photo?'display:block':''}"></div>
   <div class="field"><label>Name</label><input name="name" required placeholder="e.g. Stone baggy jeans" value="${esc(x.name||'')}"></div>`;
