@@ -10,6 +10,7 @@ const FORECAST_URL='https://api.open-meteo.com/v1/forecast';
 const GEOCODE_URL='https://geocoding-api.open-meteo.com/v1/search';
 let busy=false,activePlace=null,lastLoaded=0,usedGps=false,started=false;
 let operationKind='',gpsAttempt=0;
+let forecastDay=0,lastForecast=null;
 function fail(source,error){
   try { if(typeof logWardrobeError==='function') logWardrobeError('Weather '+source,error); }
   catch(e) { console.warn('Weather issue',source); }
@@ -26,6 +27,7 @@ function setBusy(value,description,kind='forecast'){
  if(spinner)spinner.hidden=!value;
  const refresh=node('weatherRefresh');
  if(refresh)refresh.disabled=value;
+ const dayToggle=node('weatherDayToggle');if(dayToggle)dayToggle.disabled=value;
  const gps=node('weatherUseLocation');
  if(gps)gps.disabled=value;
  const find=node('weatherTownSubmit');
@@ -80,25 +82,39 @@ function weatherSymbol(code){
 function rainHour(hour){
  return (Number(hour.rain)||0)>=0.25||(Number(hour.pop)||0)>=60||[51,53,55,56,57,61,63,65,66,67,80,81,82,95,96,99].includes(hour.code);
 }
-function weatherBrief(data){
+function weatherBrief(data,day=0){
  const cur=data.current,hourly=data.hourly;
  if(!cur||!hourly||!Array.isArray(hourly.time)||!hourly.time.length)throw Error('Incomplete hourly weather forecast');
- const temp=Number(cur.temperature_2m),feel=Number(cur.apparent_temperature),wind=Number(cur.wind_speed_10m);
+ let temp=Number(cur.temperature_2m),feel=Number(cur.apparent_temperature),wind=Number(cur.wind_speed_10m),low=null,code=Number(cur.weather_code)||0;
  if(!Number.isFinite(temp)||!Number.isFinite(feel))throw Error('Invalid current temperature data');
  const now=String(cur.time||hourly.time[0]);
  const currentHour=now.slice(0,13);
  const today=now.slice(0,10);
- const parts=hourly.time.map((time,i)=>({
+ const allParts=hourly.time.map((time,i)=>({
     time, temp:Number(hourly.temperature_2m?.[i]),
     feel:Number(hourly.apparent_temperature?.[i]),pop:Number(hourly.precipitation_probability?.[i])||0,
     rain:Number(hourly.precipitation?.[i])||0,
     wind:Number(hourly.wind_speed_10m?.[i])||0,
     gust:Number(hourly.wind_gusts_10m?.[i])||0,
     code:Number(hourly.weather_code?.[i])
- })).filter(h=>h.time.slice(0,13)>=currentHour).slice(0,14);
- // Keep the remainder of today when possible, including later showers.
+ }));
+ const parts=allParts.filter(h=>h.time.slice(0,13)>=currentHour).slice(0,14);
  const todayParts=parts.filter(h=>h.time.slice(0,10)===today);
- const forecast=(todayParts.length>=3?todayParts:parts.slice(0,9));
+ let forecast=(todayParts.length>=3?todayParts:parts.slice(0,9)),wearHours=forecast;
+ let targetDate=today;
+ if(day===1){
+   // The API's hourly timestamps are local to the chosen town, not the phone.
+   targetDate=allParts.find(h=>h.time.slice(0,10)>today)?.time.slice(0,10);
+   if(!targetDate)throw Error('Tomorrow’s forecast is not available');
+   forecast=allParts.filter(h=>h.time.slice(0,10)===targetDate);
+   wearHours=forecast.filter(h=>Number(h.time.slice(11,13))>=6);
+   if(!wearHours.length)wearHours=forecast;
+   const temperatures=forecast.map(h=>h.temp).filter(Number.isFinite);
+   const noon=forecast.find(h=>h.time.slice(11,13)==='12')||wearHours[Math.floor(wearHours.length/2)];
+   if(!temperatures.length||!noon||!Number.isFinite(noon.feel))throw Error('Incomplete tomorrow forecast');
+   temp=Math.max(...temperatures);low=Math.min(...temperatures);
+   feel=noon.feel;wind=noon.wind;code=Number.isFinite(noon.code)?noon.code:0;
+ }
  const rainHours=forecast.filter(rainHour);
  const firstRain=rainHours[0];
  let rainStart=null,rainEnd=null,rainLabel='No rain expected',rainLine='Dry for most of the day',anyRain=!!firstRain;
@@ -112,13 +128,13 @@ function weatherBrief(data){
    const start=forecast[idx].time,finish=forecast[j].time;
    // End time is the hour after the last rainy period.
    const endTime=finish.slice(0,11)+String((Number(finish.slice(11,13))+1)%24).padStart(2,'0')+':00';
-   const nowRain=idx===0&&rainHour(forecast[0]);
+   const nowRain=day===0&&idx===0&&rainHour(forecast[0]);
    if(rainHours.length>=Math.max(6,Math.floor(forecast.length*.7))){
      rainLabel='Much of the day';
-     rainLine=significant?'Rain through much of the day':'Showers on and off today';
+     rainLine=significant?'Rain through much of the day':day===1?'Showers on and off tomorrow':'Showers on and off today';
    }else{
      rainLabel=nowRain?'Now · '+hourRange(start,endTime):hourRange(start,endTime);
-     const h=Number(start.slice(11,13)),when=start.slice(0,10)!==today?'overnight':h<12?'this morning':h<17?'this afternoon':'this evening';
+     const h=Number(start.slice(11,13)),when=day===1?(h<6?'overnight':h<12?'tomorrow morning':h<17?'tomorrow afternoon':'tomorrow evening'):(start.slice(0,10)!==today?'overnight':h<12?'this morning':h<17?'this afternoon':'this evening');
      rainLine=(significant?'Rain expected ':'Showers expected ')+when;
    }
  }
@@ -126,7 +142,7 @@ function weatherBrief(data){
  const peakWind=Math.max(wind,...forecast.map(h=>Number.isFinite(h.wind)?h.wind:0));
  const veryWindy=peakGust>=55||peakWind>=35;
  const windy=peakGust>=35||peakWind>=23;
- const avgFeel=forecast.map(h=>h.feel).filter(Number.isFinite);
+ const avgFeel=wearHours.map(h=>h.feel).filter(Number.isFinite);
  const minFeel=avgFeel.length?Math.min(...avgFeel):feel;
  const cooling=minFeel<feel-4;
  const coolLabel=feel<=5?'Cold outside':feel<12?'Chilly outside':feel<18?'Mild outside':feel<24?'Quite warm outside':'Warm outside';
@@ -157,14 +173,19 @@ function weatherBrief(data){
  }else if(cooling&&!anyRain&&feel>=16){
    detail='It’s comfortable now, but it will cool down later. Take a jumper or light jacket.';
  }
- const cond=describeCode(Number(cur.weather_code)||0);
- return {temperature:Math.round(temp),feels:Math.round(feel),condition:cond,icon:weatherSymbol(Number(cur.weather_code)||0),
+ if(day===1){title=title.replace(/\btoday\b/g,'tomorrow');detail=detail.replace('comfortable now','comfortable during the day');}
+ const cond=describeCode(code);
+ return {day,low:low===null?null:Math.round(low),temperature:Math.round(temp),feels:Math.round(feel),condition:cond,icon:weatherSymbol(code),
    observations:notes,title,detail,rainLabel,precipType:snow?'Snow possible':'Rain expected',updated:Date.now()};
 }
 function renderBrief(result,label){
  node('weatherLocationLabel').textContent=label||'Your location';
  node('weatherTemp').textContent=result.temperature+'°C';
- node('weatherFeels').textContent=result.condition;
+ node('weatherFeels').textContent=result.day===1?'High · Low '+result.low+'°C · '+result.condition+' at midday':result.condition;
+ const heading=node('weatherDayHeading');if(heading)heading.textContent=result.day===1?'TOMORROW’S WEATHER':"TODAY'S WEATHER";
+ const toggle=node('weatherDayToggle');if(toggle)toggle.textContent=result.day===1?'See today':'See tomorrow';
+ const feelsLabel=node('weatherFeelsLabel');if(feelsLabel)feelsLabel.textContent=result.day===1?'Feels like at midday':'Feels like';
+ node('weatherCard').setAttribute('aria-label',result.day===1?'Tomorrow’s weather and clothing guide':"Today's weather and clothing guide");
  node('weatherIcon').innerHTML=weatherSvg(result.icon);
  node('weatherCondition').textContent=result.condition;
  const list=node('weatherObservations');
@@ -206,10 +227,11 @@ async function fetchForecast(place){
 }
 async function loadPlace(place,isGPS,approximate=false){
  if(busy)return false;
- setBusy(true,'Checking today’s forecast…');
+ setBusy(true,forecastDay===1?'Checking tomorrow’s forecast…':'Checking today’s forecast…');
  try{
   const raw=await fetchForecast(place);
-  const briefing=weatherBrief(raw);
+  const briefing=weatherBrief(raw,forecastDay);
+  lastForecast=raw;
   activePlace={...place,approximate:!!approximate};usedGps=!!isGPS;
   renderBrief(briefing,(approximate?'Approx. ':'')+(place.label||'Your location'));
   showLocationOptions(false);
@@ -338,6 +360,25 @@ function changeWardrobeWeatherLocation(){
  const next=node('weatherLocationOptions').hidden;
  showLocationOptions(next);
 }
+async function toggleWardrobeWeatherDay(){
+ if(busy)return;
+ const previous=forecastDay;
+ forecastDay=forecastDay===0?1:0;
+ // Cached hourly data makes switching immediate, without a new API call.
+ try{
+   if(lastForecast&&activePlace&&Date.now()-lastLoaded<75*60*1000){
+     const localDate=new Intl.DateTimeFormat('en-CA',{timeZone:lastForecast.timezone||'UTC',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date());
+     const value=k=>localDate.find(p=>p.type===k)?.value;
+     const date=value('year')+'-'+value('month')+'-'+value('day');
+     if(date===String(lastForecast.current.time).slice(0,10)){
+       renderBrief(weatherBrief(lastForecast,forecastDay),(activePlace.approximate?'Approx. ':'')+(activePlace.label||'Your location'));
+       showLocationOptions(false);return;
+     }
+   }
+   if(activePlace){if(!await loadPlace(activePlace,usedGps,!!activePlace.approximate))forecastDay=previous;}
+   else {await useWardrobeLocation();if(!lastForecast)forecastDay=previous;}
+ }catch(error){forecastDay=previous;fail('day switch',error);status('Forecast unavailable. Tap ↻ to retry.',true);}
+}
 async function refreshWardrobeWeather(){
  if(busy)return;
  if(!activePlace){await useWardrobeLocation();return;}
@@ -369,6 +410,7 @@ window.useWardrobeLocation=useWardrobeLocation;
 window.chooseWardrobeTown=chooseWardrobeTown;
 window.changeWardrobeWeatherLocation=changeWardrobeWeatherLocation;
 window.refreshWardrobeWeather=refreshWardrobeWeather;
+window.toggleWardrobeWeatherDay=toggleWardrobeWeatherDay;
 window.startWardrobeWeather=startWardrobeWeather;
 // Pure logic exposed for smoke tests, not dependent on any wardrobe data.
 window.wardrobeWeatherBrief=weatherBrief;
